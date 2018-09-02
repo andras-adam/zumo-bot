@@ -53,9 +53,24 @@
  * @details  ** Enable global interrupt since Zumo library uses interrupts. **<br>&nbsp;&nbsp;&nbsp;CyGlobalIntEnable;<br>
 */
 
+#if 1
+// Hello World!
+void zmain(void *p)
+{
+    (void) p; // we don't use this parameter
+    printf("\nHello, World!\n");
+
+    while(true)
+    {
+        vTaskDelay(100); // sleep (in an infinite loop)
+    }
+ }   
+#endif
+
+
 #if 0
 //battery level//
-int zmain(void *p)
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
     ADC_Battery_Start();        
@@ -91,9 +106,9 @@ int zmain(void *p)
  }   
 #endif
 
-#if 1
+#if 0
 // MQTT test
-int zmain(void *p)
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
 
@@ -120,7 +135,33 @@ int zmain(void *p)
 
 #if 0
 // button
-int zmain(void *p)
+void zmain(void *p)
+{
+    (void) p; // we don't use this parameter
+
+    while(1) {
+        printf("Press button within 5 seconds!\n");
+        int i = 50;
+        while(i > 0) {
+            if(SW1_Read() == 0) {
+                break;
+            }
+            vTaskDelay(100);
+            --i;
+        }
+        if(i > 0) {
+            printf("Good work\n");
+        }
+        else {
+            printf("You didn't press the button\n");
+        }
+    }
+}
+#endif
+
+#if 0
+// button
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
     printf("\nBoot\n");
@@ -141,7 +182,6 @@ int zmain(void *p)
         if(SW1_Read() == 0) {
             led = !led;
             BatteryLed_Write(led);
-            ShieldLed_Write(led);
             if(led) printf("Led is ON\n");
             else printf("Led is OFF\n");
             Beep(1000, 150);
@@ -154,7 +194,7 @@ int zmain(void *p)
 
 #if 0
 //ultrasonic sensor//
-int zmain(void *p)
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
     Ultra_Start();                          // Ultra Sonic Start function
@@ -168,10 +208,36 @@ int zmain(void *p)
 }   
 #endif
 
+#if 0
+//IR receiver//
+void zmain(void *p)
+{
+    (void) p; // we don't use this parameter
+    IR_Start();
+    
+    printf("\n\nIR test\n");
+    
+    IR_flush(); // clear IR receive buffer
+    printf("Buffer cleared\n");
+    
+    bool led = false;
+    // Toggle led when IR signal is received
+    for(;;)
+    {
+        IR_wait();  // wait for IR command
+        led = !led;
+        BatteryLed_Write(led);
+        if(led) printf("Led is ON\n");
+        else printf("Led is OFF\n");
+    }    
+ }   
+#endif
+
+
 
 #if 0
 //IR receiver//
-int zmain(void *p)
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
     IR_Start();
@@ -183,18 +249,14 @@ int zmain(void *p)
     IR_flush(); // clear IR receive buffer
     printf("Buffer cleared\n");
     
-    IR_wait(); // wait for IR command
-    printf("IR command received\n");
-    
     // print received IR pulses and their lengths
     for(;;)
     {
-        if(IR_get(&IR_val)) {
+        if(IR_get(&IR_val, portMAX_DELAY)) {
             int l = IR_val & IR_SIGNAL_MASK; // get pulse length
             int b = 0;
             if((IR_val & IR_SIGNAL_HIGH) != 0) b = 1; // get pulse state (0/1)
             printf("%d %d\r\n",b, l);
-            //printf("%d %lu\r\n",IR_val & IR_SIGNAL_HIGH ? 1 : 0, (unsigned long) (IR_val & IR_SIGNAL_MASK));
         }
     }    
  }   
@@ -203,7 +265,7 @@ int zmain(void *p)
 
 #if 0
 //reflectance//
-int zmain(void *p)
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
     struct sensors_ ref;
@@ -217,12 +279,14 @@ int zmain(void *p)
     {
         // read raw sensor values
         reflectance_read(&ref);
-        printf("%5d %5d %5d %5d %5d %5d\r\n", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);       // print out each period of reflectance sensors
+        // print out each period of reflectance sensors
+        printf("%5d %5d %5d %5d %5d %5d\r\n", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);       
         
         // read digital values that are based on threshold. 0 = white, 1 = black
         // when blackness value is over threshold the sensors reads 1, otherwise 0
-        reflectance_digital(&dig);      //print out 0 or 1 according to results of reflectance period
-        printf("%5d %5d %5d %5d %5d %5d \r\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);        //print out 0 or 1 according to results of reflectance period
+        reflectance_digital(&dig); 
+        //print out 0 or 1 according to results of reflectance period
+        printf("%5d %5d %5d %5d %5d %5d \r\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);        
         
         vTaskDelay(200);
     }
@@ -232,7 +296,7 @@ int zmain(void *p)
 
 #if 0
 //motor//
-int zmain(void *p)
+void zmain(void *p)
 {
     (void) p; // we don't use this parameter
     motor_start();              // motor start
@@ -254,7 +318,7 @@ int zmain(void *p)
 #if 0
 /* Example of how to use this Accelerometer!!!*/
 
-int zmain(void *p) {
+void zmain(void *p) {
     
     (void) p; // we don't use this parameter
     struct accData_ data;
