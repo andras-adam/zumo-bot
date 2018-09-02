@@ -4,6 +4,7 @@
 
 /* Don't remove the functions below */
 #if 0
+// writing is handled in debug_uart task
 int _write(int file, char *ptr, int len)
 {
     (void)file; /* Parameter is not used, suppress unused argument warning */
