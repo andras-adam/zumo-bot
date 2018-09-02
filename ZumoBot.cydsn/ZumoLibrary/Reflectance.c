@@ -10,7 +10,6 @@
 #include "task.h"
 
 #include "Reflectance.h"
-#include "Systick.h"
 
 static volatile struct sensors_ sensors;
 static volatile struct sensors_  digital_sensor_value;
