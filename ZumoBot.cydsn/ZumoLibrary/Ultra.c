@@ -11,7 +11,6 @@
 #include <stdbool.h>
 
 #include "Ultra.h"
-#include "Systick.h"
 
 static TaskHandle_t UltraHandle = NULL;
 static volatile int distance;

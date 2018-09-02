@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "project.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 #include "Reflectance.h"
 #include "Systick.h"
@@ -13,89 +15,102 @@
 static volatile struct sensors_ sensors;
 static volatile struct sensors_  digital_sensor_value;
 static struct sensors_ threshold = { 10000, 10000, 10000, 10000, 10000, 10000};
-static volatile bool refl_init = false;
+static TaskHandle_t ReflectanceHandle = NULL;
 
 /**
 * @brief    Reflectance Sensor handler is called from FreeRTOS systick hook
 * @details  Measuring each sensors' time to recognition of white or black
 */
-void reflectance_handler(void)
+void ReflectanceTask( void *pvParameters )
 {
-    if(!refl_init) return;
+    (void) pvParameters;
     
-    uint32_t statusR1 = Timer_R1_ReadStatusRegister();
-    uint32_t statusR2 = Timer_R2_ReadStatusRegister();
-    uint32_t statusR3 = Timer_R3_ReadStatusRegister();
-    uint32_t statusL3 = Timer_L3_ReadStatusRegister();
-    uint32_t statusL2 = Timer_L2_ReadStatusRegister();
-    uint32_t statusL1 = Timer_L1_ReadStatusRegister();
+    TickType_t prev;
+    uint32_t statusR1;
+    uint32_t statusR2;
+    uint32_t statusR3;
+    uint32_t statusL3;
+    uint32_t statusL2;
+    uint32_t statusL1;
+    
+    prev = xTaskGetTickCount();
+    
+    while(1) {
+        statusR1 = Timer_R1_ReadStatusRegister();
+        statusR2 = Timer_R2_ReadStatusRegister();
+        statusR3 = Timer_R3_ReadStatusRegister();
+        statusL3 = Timer_L3_ReadStatusRegister();
+        statusL2 = Timer_L2_ReadStatusRegister();
+        statusL1 = Timer_L1_ReadStatusRegister();
 
-    if(statusR1 & Timer_R1_STATUS_CAPTURE) {
-        sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCapture();
-    }
-    else {
-        sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCounter();
-    }
-    
-    if(statusL1 & Timer_L1_STATUS_CAPTURE) {
-        sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCapture();
-    }
-    else {
-        sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCounter();
-    }
+        if(statusR1 & Timer_R1_STATUS_CAPTURE) {
+            sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCapture();
+        }
+        else {
+            sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCounter();
+        }
+        
+        if(statusL1 & Timer_L1_STATUS_CAPTURE) {
+            sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCapture();
+        }
+        else {
+            sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCounter();
+        }
 
-    if(statusR2 & Timer_R2_STATUS_CAPTURE) {
-        sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCapture();
-    }
-    else {
-        sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCounter();
-    }
-    
-    if(statusL2 & Timer_L2_STATUS_CAPTURE) {
-        sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCapture();
-    }
-    else {
-        sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCounter();
-    }
-    
-    if(statusR3 & Timer_R3_STATUS_CAPTURE) {
-        sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCapture();
-    }
-    else {
-        sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCounter();
-    }
-    
-    if(statusL3 & Timer_L3_STATUS_CAPTURE) {
-        sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCapture();
-    }
-    else {
-        sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCounter();
-    }
-    
-    
-    Timer_Reset_Write(1);
-    
-    R1_SetDriveMode(PIN_DM_STRONG);
-    R1_Write(1);
-    R2_SetDriveMode(PIN_DM_STRONG);
-    R2_Write(1);
-    R3_SetDriveMode(PIN_DM_STRONG);
-    R3_Write(1);
-    L3_SetDriveMode(PIN_DM_STRONG);
-    L3_Write(1);
-    L2_SetDriveMode(PIN_DM_STRONG);
-    L2_Write(1);
-    L1_SetDriveMode(PIN_DM_STRONG);
-    L1_Write(1);
-    Timer_Reset_Write(0);
+        if(statusR2 & Timer_R2_STATUS_CAPTURE) {
+            sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCapture();
+        }
+        else {
+            sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCounter();
+        }
+        
+        if(statusL2 & Timer_L2_STATUS_CAPTURE) {
+            sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCapture();
+        }
+        else {
+            sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCounter();
+        }
+        
+        if(statusR3 & Timer_R3_STATUS_CAPTURE) {
+            sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCapture();
+        }
+        else {
+            sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCounter();
+        }
+        
+        if(statusL3 & Timer_L3_STATUS_CAPTURE) {
+            sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCapture();
+        }
+        else {
+            sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCounter();
+        }
+        
+        
+        Timer_Reset_Write(1);
+        
+        R1_SetDriveMode(PIN_DM_STRONG);
+        R1_Write(1);
+        R2_SetDriveMode(PIN_DM_STRONG);
+        R2_Write(1);
+        R3_SetDriveMode(PIN_DM_STRONG);
+        R3_Write(1);
+        L3_SetDriveMode(PIN_DM_STRONG);
+        L3_Write(1);
+        L2_SetDriveMode(PIN_DM_STRONG);
+        L2_Write(1);
+        L1_SetDriveMode(PIN_DM_STRONG);
+        L1_Write(1);
+        Timer_Reset_Write(0);
 
-    CyDelayUs(10);
-    R1_SetDriveMode(PIN_DM_DIG_HIZ);
-    R2_SetDriveMode(PIN_DM_DIG_HIZ);
-    R3_SetDriveMode(PIN_DM_DIG_HIZ);
-    L3_SetDriveMode(PIN_DM_DIG_HIZ);
-    L2_SetDriveMode(PIN_DM_DIG_HIZ);
-    L1_SetDriveMode(PIN_DM_DIG_HIZ);
+        CyDelayUs(10);
+        R1_SetDriveMode(PIN_DM_DIG_HIZ);
+        R2_SetDriveMode(PIN_DM_DIG_HIZ);
+        R3_SetDriveMode(PIN_DM_DIG_HIZ);
+        L3_SetDriveMode(PIN_DM_DIG_HIZ);
+        L2_SetDriveMode(PIN_DM_DIG_HIZ);
+        L1_SetDriveMode(PIN_DM_DIG_HIZ);
+        vTaskDelayUntil(&prev, 1);
+    }
 }
 
 
@@ -105,15 +120,18 @@ void reflectance_handler(void)
 */
 void reflectance_start()
 {
-    Refl_led_Write(1);
+    if(ReflectanceHandle == NULL) {
+        Refl_led_Write(1);
 
-    Timer_R1_Start();
-    Timer_R2_Start();
-    Timer_R3_Start();
-    Timer_L3_Start();
-    Timer_L2_Start();
-    Timer_L1_Start();
-    refl_init = true;
+        Timer_R1_Start();
+        Timer_R2_Start();
+        Timer_R3_Start();
+        Timer_L3_Start();
+        Timer_L2_Start();
+        Timer_L1_Start();
+        // task runs at highest priority and wakes up every millisecond but uses very little CPU time
+        xTaskCreate( ReflectanceTask, "Reflectance", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, &ReflectanceHandle );
+    }
 }
 
 

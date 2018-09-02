@@ -20,8 +20,6 @@ struct sensors_ {
     uint16_t r3;
 };
 
-void reflectance_handler(void);
-
 void reflectance_start(void);
 void reflectance_read(struct sensors_ *values);
 void reflectance_digital(struct sensors_ *digital);
