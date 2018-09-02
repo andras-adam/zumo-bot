@@ -44,16 +44,23 @@ void IR_flush(void)
 
 void IR_wait(void)
 {
+    int count = 0;
     IR_flush();
 
     while(true) {
         uint32_t tmp;
-        if(IR_get(&tmp, portMAX_DELAY) && (tmp & IR_SIGNAL_HIGH)) {
-            tmp &= IR_SIGNAL_MASK;
-            if(tmp > IR_LOWER_LIMIT && tmp < IR_UPPER_LIMIT) {
-                break;
+        if(IR_get(&tmp, configTICK_RATE_HZ / 5)) {
+            if(tmp & IR_SIGNAL_HIGH) {
+                tmp &= IR_SIGNAL_MASK;
+                if(tmp > IR_LOWER_LIMIT && tmp < IR_UPPER_LIMIT) {
+                    if(++count>4) break;
+                }
             }
         }
+        else {
+            count = 0;
+        }
+            
     }
 }    
 

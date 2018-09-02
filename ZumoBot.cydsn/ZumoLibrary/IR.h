@@ -9,8 +9,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define IR_LOWER_LIMIT 1000
-#define IR_UPPER_LIMIT 2000
+#define IR_LOWER_LIMIT 500
+#define IR_UPPER_LIMIT 5000
 #define IR_SIGNAL_HIGH 0x80000000UL
 #define IR_SIGNAL_MASK 0x7FFFFFFFUL
 
