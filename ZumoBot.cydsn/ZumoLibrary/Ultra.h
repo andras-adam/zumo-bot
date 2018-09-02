@@ -6,8 +6,6 @@
 #ifndef ULTRA_H_
 #define ULTRA_H_
 
-void ultrasonic_handler(void);
-
 // start ultrasonic sensor
 void Ultra_Start();
 

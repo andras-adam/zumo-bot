@@ -13,7 +13,7 @@
 #include "Ultra.h"
 #include "Systick.h"
 
-static volatile bool ultra_init = false;
+static TaskHandle_t UltraHandle = NULL;
 static volatile int distance;
 
 
@@ -21,23 +21,23 @@ static volatile int distance;
 * @brief    Ultrasonic handler - called from FreeRTOS systick hook
 * @details  Counts ticks to next activation
 */
-void ultrasonic_handler(void)
+void UltraSonicTask( void *pvParameters )
 {
-    if(!ultra_init) return;
+    (void) pvParameters;
 
-    static int cnt;
-
-    cnt++;
-  
-    if(cnt == 1) {
-        Trig_Write(0); // Trigger Low
-    }
+    TickType_t prev;
+    
+    prev = xTaskGetTickCount();
     
     // try to trigger every 25 ms
-    if(cnt >= 25) {
-        cnt = 0;  
+    while(1) {
         // Trigger High only if echo pulse is not active
-        if(Echo_Read() == 0) Trig_Write(1);
+        if(Echo_Read() == 0) {
+            Trig_Write(1);
+            vTaskDelay(1);
+            Trig_Write(0);
+        }
+        vTaskDelayUntil(&prev, 25);
     }
 }
 
@@ -89,9 +89,12 @@ CY_ISR(ultra_isr_handler)
 */
 void Ultra_Start()
 {
-    ultra_isr_StartEx(ultra_isr_handler);               // Start ultra sonic interrupt
-    Timer_Start();                                      // Start Timer
-    ultra_init = true;
+    if(UltraHandle == NULL) {
+        ultra_isr_StartEx(ultra_isr_handler);               // Start ultra sonic interrupt
+        Timer_Start();                                      // Start Echo pulse capture timer
+        // task runs at highest priority but sleeps most of the time
+        xTaskCreate( UltraSonicTask, "Ultra", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, &UltraHandle );
+    }
 }
 
 int Ultra_GetDistance(void)

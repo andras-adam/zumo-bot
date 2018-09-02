@@ -5,6 +5,5 @@
 void vApplicationTickHook(void) 
 {
     /* User ISR Code*/
-    ultrasonic_handler();
     reflectance_handler();
 }  
