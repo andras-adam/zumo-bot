@@ -45,8 +45,8 @@
 #include "mqtt_sender.h"
 #include <time.h>
 #include <sys/time.h>
-
-
+#include "serial1.h"
+#include <unistd.h>
 /**
  * @file    main.c
  * @brief   
@@ -67,6 +67,34 @@ void zmain(void *p)
  }   
 #endif
 
+#if 0
+// Name and age
+void zmain(void *p)
+{
+    (void) p; // we don't use this parameter
+    char name[32];
+    int age;
+    
+    
+    printf("\n\n");
+    
+    printf("Enter your name: ");
+    //fflush(stdout);
+    scanf("%s", name);
+    printf("Enter your age: ");
+    //fflush(stdout);
+    scanf("%d", &age);
+    
+    printf("You are [%s], age = %d\n", name, age);
+
+    while(true)
+    {
+        BatteryLed_Write(!SW1_Read());
+        vTaskDelay(100);
+    }
+ }   
+#endif
+
 
 #if 0
 //battery level//
@@ -77,7 +105,6 @@ void zmain(void *p)
 
     int16 adcresult =0;
     float volts = 0.0;
-    int ctr = 0;
 
     printf("\nBoot\n");
 
@@ -91,8 +118,8 @@ void zmain(void *p)
     for(;;)
     {
         char msg[80];
-        ADC_Battery_StartConvert();
-        if(ADC_Battery_IsEndConversion(ADC_Battery_WAIT_FOR_RESULT)) {   // wait for get ADC converted value
+        ADC_Battery_StartConvert(); // start sampling
+        if(ADC_Battery_IsEndConversion(ADC_Battery_WAIT_FOR_RESULT)) {   // wait for ADC converted value
             adcresult = ADC_Battery_GetResult16(); // get the ADC value (0 - 4095)
             // convert value to Volts
             // you need to implement the conversion
@@ -101,7 +128,6 @@ void zmain(void *p)
             printf("%d %f\r\n",adcresult, volts);
         }
         vTaskDelay(500);
-        ctr++;
     }
  }   
 #endif
@@ -151,6 +177,7 @@ void zmain(void *p)
         }
         if(i > 0) {
             printf("Good work\n");
+            while(SW1_Read() == 0) vTaskDelay(10); // wait until button is released
         }
         else {
             printf("You didn't press the button\n");
@@ -299,14 +326,16 @@ void zmain(void *p)
 void zmain(void *p)
 {
     (void) p; // we don't use this parameter
-    motor_start();              // motor start
+    motor_start();              // enable motor controller
 
     motor_forward(100,2000);     // moving forward
     motor_turn(200,50,2000);     // turn
     motor_turn(50,200,2000);     // turn
     motor_backward(100,2000);    // moving backward
-       
-    motor_stop();               // motor stop
+     
+    motor_forward(0,0);         // stop motors
+
+    motor_stop();               // disable motor controller
     
     for(;;)
     {
