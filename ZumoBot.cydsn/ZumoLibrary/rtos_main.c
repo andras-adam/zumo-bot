@@ -53,7 +53,7 @@ int main( void )
 	prvHardwareSetup();
 
 	/* Start tasks. */
-  	( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL );
+  	( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL );
   	( void ) xTaskCreate( DebugCommandTask, "DbgCmd", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL );
   	( void ) xTaskCreate( zmain, "Zumo", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
   	( void ) xTaskCreate( MQTTSendTask, "MQTT_send", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
