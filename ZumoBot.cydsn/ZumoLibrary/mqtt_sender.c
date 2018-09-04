@@ -14,10 +14,6 @@
 #include "mqtt_sender.h"
 #include "zumo_config.h"
 
-#ifndef START_MQTT
-#define START_MQTT 0
-#endif    
-
 
 
 typedef struct mqtt_message_ {
@@ -46,12 +42,6 @@ void MQTTSendTask(void *pvParameters)
 	unsigned char sendbuf[128], readbuf[128];
 	int rc = 0;
 	MQTTPacket_connectData connectData = MQTTPacket_connectData_initializer;
-
-#if START_MQTT == 0   
-    vTaskDelay(100);
-    printf("MQTT disabled\n");
-    vTaskSuspend(NULL);
-#endif    
     
     for(int i = 0; i < MAX_MESSAGE; ++i) {
         char *p = buffers[i];
