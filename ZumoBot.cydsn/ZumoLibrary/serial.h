@@ -28,6 +28,8 @@
 #ifndef SERIAL_COMMS_H
 #define SERIAL_COMMS_H
 
+#include "FreeRTOS.h" 
+
 typedef void * xComPortHandle;
 
 typedef enum

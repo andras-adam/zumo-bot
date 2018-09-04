@@ -19,6 +19,7 @@
 #include "semphr.h"
 #include "debug_uart.h"
 #include "zumo_config.h"
+#include "serial1.h"
 
 #include "esp8266_socket.h"
 
@@ -59,13 +60,14 @@ void DebugUartTask( void *pvParameters )
 {
     (void) pvParameters; //quiet the compiler warning
     char c;
-
+    while(1) vTaskDelay(100);
+    
     while(true) {
     	if( pdTRUE == xQueueReceive( xSerialTxQueue, &c, portMAX_DELAY ) )
     	{
     		/* Picked up a character. */
             xSemaphoreTake(u1_mutex, portMAX_DELAY);
-            UART_1_PutChar(c);
+            //UART_1_PutChar(c);
             xSemaphoreGive(u1_mutex);
     	}
     }
@@ -80,7 +82,7 @@ void DebugUartTaskInit(void)
     u1_mutex = xSemaphoreCreateMutex();
 }    
 
-
+#if 0
 int _write(int file, const char *ptr, int len)
 {
     (void)file; /* Parameter is not used, suppress unused argument warning */
@@ -95,11 +97,11 @@ int _write(int file, const char *ptr, int len)
 	return len;
 
 }
-
+#endif
 
 void ds(const char *s) 
 {
-    _write(0, s, strlen(s));   
+    //_write(0, s, strlen(s));   
 }
 
 #define CMD_MAX_SIZE 64
@@ -112,7 +114,8 @@ void DebugCommandTask( void *pvParameters )
 
     while(true) {
         xSemaphoreTake(u1_mutex, portMAX_DELAY);
-        c = UART_1_GetChar();
+        //c = UART_1_GetChar();
+        c = 0;
         xSemaphoreGive(u1_mutex);
         if(c != 0) {
             if(c == '\n' || c == '\r') {

@@ -35,8 +35,15 @@
 #include "semphr.h"
 
 #include "serial.h"
+#include "serial1.h"
 #include "debug_uart.h"
 #include "mqtt_sender.h"
+#include "zumo_config.h"
+
+#ifndef START_MQTT
+#define START_MQTT 0
+#endif    
+
 
 
 extern void zmain(void *pvParameters);
@@ -52,11 +59,20 @@ int main( void )
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
 	prvHardwareSetup();
 
+    
+    /* Task initializations */
+    vSerial1PortInitMinimal(256);
+    RetargetInit();
+    DebugUartTaskInit();
+    MQTTSendTaskInit();
+    
 	/* Start tasks. */
-  	( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL );
-  	( void ) xTaskCreate( DebugCommandTask, "DbgCmd", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL );
+  	//( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL );
+  	//( void ) xTaskCreate( DebugCommandTask, "DbgCmd", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL );
   	( void ) xTaskCreate( zmain, "Zumo", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
+#if START_MQTT == 1   
   	( void ) xTaskCreate( MQTTSendTask, "MQTT_send", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
+#endif    
     
 	/* Will only get here if there was insufficient memory to create the idle
     task.  The idle task is created within vTaskStartScheduler(). */
@@ -86,10 +102,7 @@ extern cyisraddress CyRamVectors[];
 	/* Start-up the peripherals. */
 	UART_1_Start();
     UART_2_Start();
-    
-    /* Task initializations */
-    DebugUartTaskInit();
-    MQTTSendTaskInit();
+
 }
 /*---------------------------------------------------------------------------*/
 
