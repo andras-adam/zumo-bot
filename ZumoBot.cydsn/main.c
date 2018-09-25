@@ -411,4 +411,42 @@ void zmain(void *p) {
  }   
 
 #endif
+
+#if 0
+void zmain(void *p) {
+    
+    (void) p; // we don't use this parameter
+    
+    RTC_Start(); // start real time clock
+    
+    RTC_TIME_DATE now;
+
+    // set current time
+    now.Hour = 12;
+    now.Min = 34;
+    now.Sec = 56;
+    now.DayOfMonth = 25;
+    now.Month = 9;
+    now.Year = 2018;
+    RTC_WriteTime(&now); // write the time to real time clock
+
+    for(;;)
+    {
+        if(SW1_Read() == 0) {
+            // read the current time
+            RTC_DisableInt(); /* Disable Interrupt of RTC Component */
+            now = *RTC_ReadTime(); /* copy the current time to a local variable */
+            RTC_EnableInt(); /* Enable Interrupt of RTC Component */
+
+            // print the current time
+            printf("%2d:%02d.%02d\n", now.Hour, now.Min, now.Sec);
+            
+            // wait until button is released
+            while(SW1_Read() == 0) vTaskDelay(50);
+        }
+        vTaskDelay(50);
+    }
+ }   
+#endif
+
 /* [] END OF FILE */
