@@ -134,7 +134,6 @@ CY_ISR(vUart1RxISR)
 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 volatile unsigned char ucStatus = 0;
 signed char cInChar = 0;
-//unsigned long ulMask = 0;
 
 	/* Read the status to acknowledge. */
 	ucStatus = UART_1_ReadRxStatus();
@@ -143,19 +142,12 @@ signed char cInChar = 0;
 	if( 0 != ( ucStatus & UART_1_RX_STS_FIFO_NOTEMPTY ) )
 	{
 		/* Get the character. */
-		//cInChar = UART_1_GetChar();
 		cInChar = UART_1_ReadRxData();
-		/* Mask off the other RTOS interrupts to interact with the queue. */
-		//ulMask = portSET_INTERRUPT_MASK_FROM_ISR(); // krl: not needed! fromISR functions do this automatically
+		/* Try to deliver the character. */
+		if( pdTRUE != xQueueSendFromISR( xSerialRxQueue, &cInChar, &xHigherPriorityTaskWoken ) )
 		{
-			/* Try to deliver the character. */
-			if( pdTRUE != xQueueSendFromISR( xSerialRxQueue, &cInChar, &xHigherPriorityTaskWoken ) )
-			{
-				/* Run out of space. */
-			}
-            //else dc(cInChar); // krl: for debugging driver problem
+			/* Run out of space. */
 		}
-		//portCLEAR_INTERRUPT_MASK_FROM_ISR( ulMask );  // krl: not needed! fromISR functions do this automatically
 	}
 
 	/* If we delivered the character then a context switch might be required.
@@ -174,35 +166,28 @@ CY_ISR(vUart1TxISR)
 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 volatile unsigned char ucStatus = 0;
 signed char cOutChar = 0;
-unsigned long ulMask = 0;
 
 	/* Read the status to acknowledge. */
 	ucStatus = UART_1_ReadTxStatus();
 	
 	/* Check to see whether this is a genuine interrupt. */
-	if( ( 0 != ( ucStatus & UART_1_TX_STS_COMPLETE ) ) || ( 0 != ( ucStatus & UART_1_TX_STS_FIFO_EMPTY ) ) )
+	if( 0 != ( ucStatus & UART_1_TX_STS_FIFO_EMPTY ) )
 	{	
-		/* Mask off the other RTOS interrupts to interact with the queue. */
-		ulMask = portSET_INTERRUPT_MASK_FROM_ISR();
+        do
 		{
 			if( pdTRUE == xQueueReceiveFromISR( xSerialTxQueue, &cOutChar, &xHigherPriorityTaskWoken ) )
 			{
 				/* Send the next character. */
 				UART_1_PutChar( cOutChar );			
-
-				/* If we are firing, then the only interrupt we are interested in
-				is the Complete. The application code will add the Empty interrupt
-				when there is something else to be done. */
-				UART_1_SetTxInterruptMode( UART_1_TX_STS_COMPLETE );
 			}
 			else
 			{
 				/* There is no work left so disable the interrupt until the application 
 				puts more into the queue. */
 				UART_1_SetTxInterruptMode( 0 );
+                break;
 			}
-		}
-		portCLEAR_INTERRUPT_MASK_FROM_ISR( ulMask );
+		} while((UART_1_ReadTxStatus() & UART_1_TX_STS_FIFO_FULL) == 0);
 	}
 
 	/* If we delivered the character then a context switch might be required.
