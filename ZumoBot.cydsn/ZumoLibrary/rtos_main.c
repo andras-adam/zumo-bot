@@ -54,6 +54,12 @@ extern void zmain(void *pvParameters);
 static void prvHardwareSetup( void );
 /*---------------------------------------------------------------------------*/
 
+static void start_zmain(void *p) {
+    zmain(p);
+    printf("\n\n\nERROR ZMAIN ENDED!!!\n\n");
+    vTaskSuspend(NULL);
+}
+
 int main( void )
 {
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
@@ -67,9 +73,9 @@ int main( void )
     MQTTSendTaskInit();
     
 	/* Start tasks. */
-  	//( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL );
+  	//( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL );
   	//( void ) xTaskCreate( DebugCommandTask, "DbgCmd", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL );
-  	( void ) xTaskCreate( zmain, "Zumo", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
+  	( void ) xTaskCreate( start_zmain, "Zumo", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 1, NULL );
 #if START_MQTT == 1   
   	( void ) xTaskCreate( MQTTSendTask, "MQTT_send", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
 #endif    

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
@@ -105,6 +106,21 @@ static void free_buffer(void *buffer)
 {
     xQueueSend(buf_q, &buffer, 0);
 }    
+
+int print_mqtt(const char *topic, const char *fmt, ...)
+{
+    va_list argptr;
+    int cnt=0;
+    char pbuf[BUFFER_SIZE];
+
+    va_start(argptr, fmt);
+    cnt = vsnprintf(pbuf, BUFFER_SIZE, fmt, argptr);
+    va_end(argptr);
+
+    send_mqtt(topic, pbuf);
+
+    return(cnt);
+}
 
 void send_mqtt(const char *topic, const char *message)
 {

@@ -355,20 +355,58 @@ void zmain(void *p) {
     printf("Accelerometer test...\n");
 
     if(!LSM303D_Start()){
-    
         printf("LSM303D failed to initialize!!! Program is Ending!!!\n");
-        return 0;
-    
+        vTaskSuspend(NULL);
     }
-    else
-        printf("Device Ok...");
-        
-   
+    else {
+        printf("Device Ok...\n");
+    }
+    
     for(;;)
     {
         LSM303D_Read_Acc(&data);
-        printf("%10d %10d %10d\n",data.accX, data.accY, data.accZ);
+        printf("%8d %8d %8d\n",data.accX, data.accY, data.accZ);
         vTaskDelay(50);
+    }
+ }   
+#endif    
+
+#if 0
+
+void zmain(void *p) {
+    
+    (void) p; // we don't use this parameter
+    struct accData_ data;
+    struct sensors_ ref;
+    struct sensors_ dig;
+    
+    printf("MQTT and sensor test...\n");
+
+    if(!LSM303D_Start()){
+        printf("LSM303D failed to initialize!!! Program is Ending!!!\n");
+        vTaskSuspend(NULL);
+    }
+    else {
+        printf("Accelerometer Ok...\n");
+    }
+    
+    int ctr = 0;
+    reflectance_start();
+    for(;;)
+    {
+        LSM303D_Read_Acc(&data);
+        if(data.accX > 1500 || ++ctr > 1000) {
+            printf("Acc: %8d %8d %8d\n",data.accX, data.accY, data.accZ);
+            print_mqtt("Zumo01/acc", "%d,%d,%d", data.accX, data.accY, data.accZ);
+            reflectance_read(&ref);
+            printf("Ref: %8d %8d %8d %8d %8d %8d\n", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);       
+            print_mqtt("Zumo01/ref", "%d,%d,%d,%d,%d,%d", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);
+            reflectance_digital(&dig);
+            printf("Dig: %8d %8d %8d %8d %8d %8d\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
+            print_mqtt("Zumo01/dig", "%d,%d,%d,%d,%d,%d", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
+            ctr = 0;
+        }
+        vTaskDelay(10);
     }
  }   
 
