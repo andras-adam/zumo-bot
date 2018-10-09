@@ -46,7 +46,7 @@
 
 
 
-extern void zmain(void *pvParameters);
+extern void zmain(void);
 
 /*
  * Installs the RTOS interrupt handlers and starts the peripherals.
@@ -55,8 +55,9 @@ static void prvHardwareSetup( void );
 /*---------------------------------------------------------------------------*/
 
 static void start_zmain(void *p) {
-    zmain(p);
-    printf("\n\n\nERROR ZMAIN ENDED!!!\n\n");
+    (void) p; // we don't use this parameter
+    zmain();
+    printf("\n\n\nERROR - ZMAIN ENDED!!!\n\n");
     vTaskSuspend(NULL);
 }
 

@@ -55,9 +55,8 @@
 
 #if 1
 // Hello World!
-void zmain(void *p)
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     printf("\nHello, World!\n");
 
     while(true)
@@ -71,7 +70,6 @@ void zmain(void *p)
 // Name and age
 void zmain(void *p)
 {
-    (void) p; // we don't use this parameter
     char name[32];
     int age;
     
@@ -98,9 +96,8 @@ void zmain(void *p)
 
 #if 0
 //battery level//
-void zmain(void *p)
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     ADC_Battery_Start();        
 
     int16 adcresult =0;
@@ -133,38 +130,9 @@ void zmain(void *p)
 #endif
 
 #if 0
-// MQTT test
-void zmain(void *p)
-{
-    (void) p; // we don't use this parameter
-
-    int ctr = 0;
-
-    printf("\nBoot\n");
-    send_mqtt("Zumo01/debug", "Boot");
-
-    //BatteryLed_Write(1); // Switch led on 
-    BatteryLed_Write(0); // Switch led off 
-
-    for(;;)
-    {
-        char msg[80];
-        printf("Ctr: %d, Button: %d\n", ctr, SW1_Read());
-        DEBUGM("Zumo01/debug", msg, "Ctr: %d, Button: %d", ctr, SW1_Read());
-
-        vTaskDelay(1000);
-        ctr++;
-    }
- }   
-#endif
-
-
-#if 0
 // button
-void zmain(void *p)
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
-
     while(1) {
         printf("Press button within 5 seconds!\n");
         int i = 50;
@@ -188,9 +156,8 @@ void zmain(void *p)
 
 #if 0
 // button
-void zmain(void *p)
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     printf("\nBoot\n");
 
     //BatteryLed_Write(1); // Switch led on 
@@ -221,14 +188,13 @@ void zmain(void *p)
 
 #if 0
 //ultrasonic sensor//
-void zmain(void *p)
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     Ultra_Start();                          // Ultra Sonic Start function
     
     while(1) {
         int d = Ultra_GetDistance();
-        //If you want to print out the value  
+        // Print the detected distance (centimeters)
         printf("distance = %d\r\n", d);
         vTaskDelay(200);
     }
@@ -236,8 +202,8 @@ void zmain(void *p)
 #endif
 
 #if 0
-//IR receiver//
-void zmain(void *p)
+//IR receiverm - how to wait for IR remote commands
+void zmain(void)
 {
     (void) p; // we don't use this parameter
     IR_Start();
@@ -263,10 +229,9 @@ void zmain(void *p)
 
 
 #if 0
-//IR receiver//
-void zmain(void *p)
+//IR receiver - read raw data
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     IR_Start();
     
     uint32_t IR_val; 
@@ -291,10 +256,9 @@ void zmain(void *p)
 
 
 #if 0
-//reflectance//
-void zmain(void *p)
+//reflectance
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     struct sensors_ ref;
     struct sensors_ dig;
 
@@ -322,12 +286,14 @@ void zmain(void *p)
 
 
 #if 0
-//motor//
-void zmain(void *p)
+//motor
+void zmain(void)
 {
-    (void) p; // we don't use this parameter
     motor_start();              // enable motor controller
+    motor_forward(0,0);         // set speed to zero to stop motors
 
+    vTaskDelay(3000);
+    
     motor_forward(100,2000);     // moving forward
     motor_turn(200,50,2000);     // turn
     motor_turn(50,200,2000);     // turn
@@ -345,11 +311,9 @@ void zmain(void *p)
 #endif
 
 #if 0
-/* Example of how to use this Accelerometer!!!*/
-
-void zmain(void *p) {
-    
-    (void) p; // we don't use this parameter
+/* Example of how to use te Accelerometer!!!*/
+void zmain(void)
+{
     struct accData_ data;
     
     printf("Accelerometer test...\n");
@@ -372,10 +336,32 @@ void zmain(void *p) {
 #endif    
 
 #if 0
+// MQTT test
+void zmain(void)
+{
+    int ctr = 0;
 
-void zmain(void *p) {
-    
-    (void) p; // we don't use this parameter
+    printf("\nBoot\n");
+    send_mqtt("Zumo01/debug", "Boot");
+
+    //BatteryLed_Write(1); // Switch led on 
+    BatteryLed_Write(0); // Switch led off 
+
+    for(;;)
+    {
+        printf("Ctr: %d, Button: %d\n", ctr, SW1_Read());
+        print_mqtt("Zumo01/debug", "Ctr: %d, Button: %d", ctr, SW1_Read());
+
+        vTaskDelay(1000);
+        ctr++;
+    }
+ }   
+#endif
+
+
+#if 0
+void zmain(void)
+{    
     struct accData_ data;
     struct sensors_ ref;
     struct sensors_ dig;
@@ -395,6 +381,7 @@ void zmain(void *p) {
     for(;;)
     {
         LSM303D_Read_Acc(&data);
+        // send data when we detect a hit and at 10 second intervals
         if(data.accX > 1500 || ++ctr > 1000) {
             printf("Acc: %8d %8d %8d\n",data.accX, data.accY, data.accZ);
             print_mqtt("Zumo01/acc", "%d,%d,%d", data.accX, data.accY, data.accZ);
@@ -413,10 +400,8 @@ void zmain(void *p) {
 #endif
 
 #if 0
-void zmain(void *p) {
-    
-    (void) p; // we don't use this parameter
-    
+void zmain(void)
+{    
     RTC_Start(); // start real time clock
     
     RTC_TIME_DATE now;
