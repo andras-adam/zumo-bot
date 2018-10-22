@@ -68,7 +68,7 @@ void zmain(void)
 
 #if 0
 // Name and age
-void zmain(void *p)
+void zmain(void)
 {
     char name[32];
     int age;
