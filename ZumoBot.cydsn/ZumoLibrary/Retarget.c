@@ -69,7 +69,10 @@ int _read (int file, char *ptr, int count)
         }
         if(lf > 0) {
             if(cnt > 0) {
-                if(buf[tail] == '\n') lf--;
+                if(buf[tail] == '\n') {
+                    lf--;
+                    count = 0;
+                }
                 *ptr++ = buf[tail];
                 tail = (tail + 1) & 0x7F;
                 cnt--;
