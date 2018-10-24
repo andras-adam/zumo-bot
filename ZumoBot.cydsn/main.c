@@ -205,7 +205,6 @@ void zmain(void)
 //IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
-    (void) p; // we don't use this parameter
     IR_Start();
     
     printf("\n\nIR test\n");
