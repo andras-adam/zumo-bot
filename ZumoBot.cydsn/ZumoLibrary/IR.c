@@ -50,17 +50,20 @@ void IR_wait(void)
     while(true) {
         uint32_t tmp;
         if(IR_get(&tmp, configTICK_RATE_HZ / 5)) {
-            if(tmp & IR_SIGNAL_HIGH) {
+            if(!(tmp & IR_SIGNAL_HIGH)) {
                 tmp &= IR_SIGNAL_MASK;
-                if(tmp > IR_LOWER_LIMIT && tmp < IR_UPPER_LIMIT) {
-                    if(++count>4) break;
+                if(tmp > IR_LOWER_LIMIT) {
+                    count += tmp;
+                    if(count>20000) break;
+                }
+                else {
+                    count = 0;
                 }
             }
         }
         else {
             count = 0;
         }
-            
     }
 }    
 
