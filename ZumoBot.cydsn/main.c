@@ -112,7 +112,7 @@ void zmain(void)
     // SW1_Read() returns zero when button is pressed
     // SW1_Read() returns one when button is not pressed
 
-    for(;;)
+    while(true)
     {
         char msg[80];
         ADC_Battery_StartConvert(); // start sampling
@@ -133,7 +133,7 @@ void zmain(void)
 // button
 void zmain(void)
 {
-    while(1) {
+    while(true) {
         printf("Press button within 5 seconds!\n");
         int i = 50;
         while(i > 0) {
@@ -170,7 +170,7 @@ void zmain(void)
     
     bool led = false;
     
-    for(;;)
+    while(true)
     {
         // toggle led state when button is pressed
         if(SW1_Read() == 0) {
@@ -192,7 +192,7 @@ void zmain(void)
 {
     Ultra_Start();                          // Ultra Sonic Start function
     
-    while(1) {
+    while(true) {
         int d = Ultra_GetDistance();
         // Print the detected distance (centimeters)
         printf("distance = %d\r\n", d);
@@ -214,7 +214,7 @@ void zmain(void)
     
     bool led = false;
     // Toggle led when IR signal is received
-    for(;;)
+    while(true)
     {
         IR_wait();  // wait for IR command
         led = !led;
@@ -241,7 +241,7 @@ void zmain(void)
     printf("Buffer cleared\n");
     
     // print received IR pulses and their lengths
-    for(;;)
+    while(true)
     {
         if(IR_get(&IR_val, portMAX_DELAY)) {
             int l = IR_val & IR_SIGNAL_MASK; // get pulse length
@@ -265,7 +265,7 @@ void zmain(void)
     reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
     
 
-    for(;;)
+    while(true)
     {
         // read raw sensor values
         reflectance_read(&ref);
@@ -302,9 +302,9 @@ void zmain(void)
 
     motor_stop();               // disable motor controller
     
-    for(;;)
+    while(true)
     {
-
+        vTaskDelay(100);
     }
 }
 #endif
@@ -325,7 +325,7 @@ void zmain(void)
         printf("Device Ok...\n");
     }
     
-    for(;;)
+    while(true)
     {
         LSM303D_Read_Acc(&data);
         printf("%8d %8d %8d\n",data.accX, data.accY, data.accZ);
@@ -346,7 +346,7 @@ void zmain(void)
     //BatteryLed_Write(1); // Switch led on 
     BatteryLed_Write(0); // Switch led off 
 
-    for(;;)
+    while(true)
     {
         printf("Ctr: %d, Button: %d\n", ctr, SW1_Read());
         print_mqtt("Zumo01/debug", "Ctr: %d, Button: %d", ctr, SW1_Read());
@@ -377,7 +377,7 @@ void zmain(void)
     
     int ctr = 0;
     reflectance_start();
-    for(;;)
+    while(true)
     {
         LSM303D_Read_Acc(&data);
         // send data when we detect a hit and at 10 second intervals
@@ -414,7 +414,7 @@ void zmain(void)
     now.Year = 2018;
     RTC_WriteTime(&now); // write the time to real time clock
 
-    for(;;)
+    while(true)
     {
         if(SW1_Read() == 0) {
             // read the current time
