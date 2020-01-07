@@ -93,6 +93,18 @@ int main( void )
 }
 /*---------------------------------------------------------------------------*/
 
+
+
+void __malloc_lock (struct _reent *reent) {
+    (void) reent;
+    vTaskSuspendAll();
+}
+
+void __malloc_unlock (struct _reent *reent) {
+    (void) reent;
+    xTaskResumeAll();
+}
+
 void prvHardwareSetup( void )
 {
 /* Port layer functions that need to be copied into the vector table. */
