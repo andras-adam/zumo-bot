@@ -63,7 +63,7 @@ struct smi_ {
     char buffer[SMI_BUFSIZE];
     char ssid[32]; // SSID
     char pwd[32]; // password
-    char sa_data[14]; // ip address
+    char sa_data[32]; // ip address
     char sa_port[14]; // port number (string)
 };
 
