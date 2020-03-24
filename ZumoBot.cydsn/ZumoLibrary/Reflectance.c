@@ -11,8 +11,11 @@
 
 #include "Reflectance.h"
 
+#include "zumo_config.h"
+
+#if ZUMO_SIMULATOR == 0
+
 static volatile struct sensors_ sensors;
-static volatile struct sensors_  digital_sensor_value;
 static struct sensors_ threshold = { 10000, 10000, 10000, 10000, 10000, 10000};
 static TaskHandle_t ReflectanceHandle = NULL;
 
@@ -194,3 +197,4 @@ void reflectance_set_threshold(uint16_t l3, uint16_t l2, uint16_t l1, uint16_t r
 }
 
 
+#endif

@@ -47,6 +47,7 @@ static SemaphoreHandle_t xSerialRxEvent = NULL;
 
 xComPortHandle xSerialPortInitMinimal( unsigned long ulWantedBaud, unsigned portBASE_TYPE uxQueueLength )
 {
+    (void) ulWantedBaud;
     /* Create rx event semaphore */
     xSerialRxEvent = xSemaphoreCreateBinary();
     
@@ -74,7 +75,8 @@ xComPortHandle xSerialPortInitMinimal( unsigned long ulWantedBaud, unsigned port
 
 void vSerialPutString( xComPortHandle pxPort, const signed char * const pcString, unsigned short usStringLength )
 {
-unsigned short usIndex = 0;
+    (void) pxPort;
+    unsigned short usIndex = 0;
 
 	for( usIndex = 0; usIndex < usStringLength; usIndex++ )
 	{
@@ -95,7 +97,8 @@ unsigned short usIndex = 0;
 
 signed portBASE_TYPE xSerialGetChar( xComPortHandle pxPort, signed char *pcRxedChar, TickType_t xBlockTime )
 {
-portBASE_TYPE xReturn = pdFALSE;
+    (void) pxPort;
+    portBASE_TYPE xReturn = pdFALSE;
 
 	if( pdTRUE == xQueueReceive( xSerialRxQueue, pcRxedChar, xBlockTime ) )
 	{
@@ -108,7 +111,8 @@ portBASE_TYPE xReturn = pdFALSE;
 
 signed portBASE_TYPE xSerialPutChar( xComPortHandle pxPort, signed char cOutChar, TickType_t xBlockTime )
 {
-portBASE_TYPE xReturn = pdFALSE;
+    (void) pxPort;
+    portBASE_TYPE xReturn = pdFALSE;
 
 	/* The ISR is processing characters is so just add to the end of the queue. */
 	if( pdTRUE == xQueueSend( xSerialTxQueue, &cOutChar, xBlockTime ) )
@@ -134,7 +138,8 @@ portBASE_TYPE xReturn = pdFALSE;
 
 signed portBASE_TYPE xSerialWaitForRxEvent( xComPortHandle pxPort, TickType_t xBlockTime )
 {
-portBASE_TYPE xReturn = pdFALSE;
+    (void) pxPort;
+    portBASE_TYPE xReturn = pdFALSE;
 
 	if( pdTRUE == xSemaphoreTake( xSerialRxEvent, xBlockTime ) )
 	{
@@ -146,6 +151,7 @@ portBASE_TYPE xReturn = pdFALSE;
 
 signed portBASE_TYPE xSerialRxWaiting(  xComPortHandle pxPort ) 
 {
+    (void) pxPort;
     return uxQueueMessagesWaiting(xSerialRxQueue);
 }
 

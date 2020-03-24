@@ -32,7 +32,7 @@
 
 void RetargetInit(void);    
 void vSerial1PortInitMinimal(unsigned portBASE_TYPE uxQueueLength );
-void vSeria1lPutString(const char * const pcString, unsigned short usStringLength );
+void vSerial1PutString(const char * const pcString, unsigned short usStringLength );
 signed portBASE_TYPE xSerial1GetChar(char *pcRxedChar, TickType_t xBlockTime );
 signed portBASE_TYPE xSerial1PutChar(char cOutChar, TickType_t xBlockTime );
 

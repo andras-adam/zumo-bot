@@ -6,8 +6,19 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "Motor.h"
+#include "zumo_config.h"
 
 
+#if ZUMO_SIMULATOR == 0
+
+void SetMotors(uint8 left_dir, uint8 right_dir, uint8 left_speed, uint8 right_speed, uint32 delay)
+{
+    MotorDirLeft_Write(left_dir);      // 0 = forward, 1 = backward
+    MotorDirRight_Write(right_dir);    // 0 = forward, 1 = backward
+    PWM_WriteCompare1(left_speed); 
+    PWM_WriteCompare2(right_speed); 
+    vTaskDelay(delay);
+}
 /**
 * @brief    Starting motor sensors
 * @details  
@@ -28,6 +39,8 @@ void motor_stop()
 }
 
 
+#endif
+
 /**
 * @brief    Moving motors forward
 * @details  giveing same speed to each side of PWM to make motors go forward
@@ -36,11 +49,9 @@ void motor_stop()
 */
 void motor_forward(uint8 speed,uint32 delay)
 {
-    MotorDirLeft_Write(0);      // set LeftMotor forward mode
-    MotorDirRight_Write(0);     // set RightMotor forward mode
-    PWM_WriteCompare1(speed); 
-    PWM_WriteCompare2(speed); 
-    vTaskDelay(delay);
+    // set LeftMotor forward mode
+    // set RightMotor forward mode
+    SetMotors(0,0, speed, speed, delay);
 }
 
 
@@ -53,9 +64,7 @@ void motor_forward(uint8 speed,uint32 delay)
 */
 void motor_turn(uint8 l_speed, uint8 r_speed, uint32 delay)
 {
-    PWM_WriteCompare1(l_speed); 
-    PWM_WriteCompare2(r_speed); 
-    vTaskDelay(delay);
+    SetMotors(0,0, l_speed, r_speed, delay);
 }
 
 
@@ -67,9 +76,7 @@ void motor_turn(uint8 l_speed, uint8 r_speed, uint32 delay)
 */
 void motor_backward(uint8 speed,uint32 delay)
 {
-    MotorDirLeft_Write(1);      // set LeftMotor backward mode
-    MotorDirRight_Write(1);     // set RightMotor backward mode
-    PWM_WriteCompare1(speed); 
-    PWM_WriteCompare2(speed); 
-    vTaskDelay(delay);
+    // set LeftMotor backward mode
+    // set RightMotor backward mode
+    SetMotors(1,1, speed, speed, delay);
 }

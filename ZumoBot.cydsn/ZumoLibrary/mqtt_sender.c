@@ -35,9 +35,10 @@ void MQTTSendTaskInit(void)
     buf_q = xQueueCreate(MAX_MESSAGE, sizeof(char *));
 }
 
-
+#if ZUMO_SIMULATOR == 0
 void MQTTSendTask(void *pvParameters)
 {
+    (void) pvParameters;
 	MQTTClient client;
 	Network network;
 	unsigned char sendbuf[128], readbuf[128];
@@ -49,12 +50,10 @@ void MQTTSendTask(void *pvParameters)
         xQueueSend(buf_q, &p, 0);
     }
 
-	pvParameters = 0;
 	NetworkInit(&network, NETWORK_SSID, NETWORK_PASSWORD);
     
 	MQTTClientInit(&client, &network, 30000, sendbuf, sizeof(sendbuf), readbuf, sizeof(readbuf));
 
-	//char* address = "iot.eclipse.org";
 	char* address = MQTT_BROKER;
 	if ((rc = NetworkConnect(&network, address, 1883)) != 0)
 		printf("Return code from network connect is %d\n", rc);
@@ -101,14 +100,50 @@ void MQTTSendTask(void *pvParameters)
 
 	/* do not return */
 }
+#else
+void MQTTSendTask(void *pvParameters)
+{
+    (void) pvParameters;
+    mqtt_message_t msg;
+    
+    for(int i = 0; i < MAX_MESSAGE; ++i) {
+        char *p = buffers[i];
+        xQueueSend(buf_q, &p, 0);
+    }
 
+    while(true)
+	{
+        if(xQueueReceive(msg_q, &msg, portMAX_DELAY) == pdFALSE) {
+            // this should never happen
+            vTaskDelay(configTICK_RATE_HZ);
+        }
+        
+        /* print message here */
+        fputs("MQTT ", stdout);
+        fputs(msg.topic, stdout);
+        fputs(" ", stdout);
+        fputs(msg.message, stdout);
+        fputs("\n", stdout);
+        
+        if(msg.free != NULL) {
+            msg.free(msg.message);
+        }
+	}
+
+	/* do not return */
+}
+#endif    
+
+#if START_MQTT == 1
 static void free_buffer(void *buffer) 
 {
     xQueueSend(buf_q, &buffer, 0);
 }    
+#endif
 
 int print_mqtt(const char *topic, const char *fmt, ...)
 {
+#if START_MQTT == 1
     va_list argptr;
     int cnt=0;
     char pbuf[BUFFER_SIZE];
@@ -120,10 +155,16 @@ int print_mqtt(const char *topic, const char *fmt, ...)
     send_mqtt(topic, pbuf);
 
     return(cnt);
+#else
+    (void) topic;
+    (void) fmt;
+    return 0;
+#endif    
 }
 
 void send_mqtt(const char *topic, const char *message)
 {
+#if START_MQTT == 1
     mqtt_message_t msg;
     msg.topic = topic;
     if(xQueueReceive(buf_q, &msg.message, configTICK_RATE_HZ / 10) == pdFALSE) {
@@ -135,6 +176,10 @@ void send_mqtt(const char *topic, const char *message)
     if(xQueueSend(msg_q, &msg, configTICK_RATE_HZ / 10) == pdFALSE) {
         free_buffer(msg.message);
     }
-    
+#else
+    (void) topic;
+    (void) message;
+#endif    
+  
 }
 

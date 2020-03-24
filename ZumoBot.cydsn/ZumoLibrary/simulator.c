@@ -1,0 +1,281 @@
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#include "project.h"
+#include "serial1.h"
+
+#include "zumo_config.h"
+
+#include "simulator.h"
+#include "Motor.h"
+#include "Reflectance.h"
+#include "Ultra.h"
+#include "IR.h"
+
+
+static QueueHandle_t motor_q;
+
+void SimulatorTaskInit(void)
+{
+    motor_q = xQueueCreate(3, sizeof(SimData));
+}
+
+#if ZUMO_SIMULATOR == 1
+    
+static volatile int motor_started;    
+/*
+ * Motor simulator
+ */
+void SetMotors(uint8 left_dir, uint8 right_dir, uint8 left_speed, uint8 right_speed, uint32 delay)
+{
+    SimData sim = { left_dir, right_dir, left_speed, right_speed, delay };
+    if(delay < 2) sim.delay = 2;
+    xQueueSend(motor_q, &sim, 0);
+    vTaskDelay(delay);
+}
+
+
+/**
+* @brief    Starting motor sensors
+* @details  
+*/
+void motor_start()
+{
+    motor_started = 1;
+}
+
+
+/**
+* @brief    Stopping motor sensors
+* @details
+*/
+void motor_stop()
+{
+    motor_started = 0;
+}
+
+/*
+ * Reflectance sensor simulator
+ */
+
+static volatile struct sensors_ sensors;
+static struct sensors_ threshold = { 10000, 10000, 10000, 10000, 10000, 10000};
+static volatile int reflectance_started;
+
+/**
+* @brief    Starting Reflectance Sensor
+* @details 
+*/
+void reflectance_start()
+{
+    reflectance_started = 1;
+}
+
+/**
+* @brief    Read reflectance sensor values
+* @details
+*/
+void reflectance_read(struct sensors_ *values)
+{
+    *values = sensors;
+}
+
+/**
+* @brief    Making Reflectance Sensor's period to digital
+* @details
+*/
+void reflectance_digital(struct sensors_ *digital)
+{
+    //if the results of reflectance_period function is over threshold, set digital_sensor_value to 1, which means it's black
+    if(sensors.l3 < threshold.l3)
+        digital->l3 = 0;
+    else
+        digital->l3 = 1;
+    
+    if(sensors.l2 < threshold.l2)
+        digital->l2 = 0;
+    else
+        digital->l2 = 1;
+    
+    if(sensors.l1 < threshold.l1)
+        digital->l1 = 0;
+    else
+        digital->l1 = 1;
+    
+    if(sensors.r1 < threshold.r1)
+        digital->r1 = 0;
+    else
+        digital->r1 = 1;
+    
+    if(sensors.r2 < threshold.r2)
+        digital->r2 = 0;
+    else
+        digital->r2 = 1;
+    
+    if(sensors.r3 < threshold.r3)
+        digital->r3 = 0;
+    else
+        digital->r3 = 1;
+        
+}
+
+void reflectance_set_threshold(uint16_t l3, uint16_t l2, uint16_t l1, uint16_t r1, uint16_t r2, uint16_t r3)
+{
+    threshold.l3 = l3;
+    threshold.l2 = l2;
+    threshold.l1 = l1;
+    threshold.r3 = r3;
+    threshold.r2 = r2;
+    threshold.r1 = r1;
+}
+
+/*
+ * Retarget printf
+ */
+
+static xSemaphoreHandle writeMutex;
+
+void RetargetInit(void)
+{
+    writeMutex = xSemaphoreCreateMutex();;
+}
+
+int _write(int file, char *ptr, int len)
+{
+    (void)file; /* Parameter is not used, suppress unused argument warning */
+    
+    if(xSemaphoreTake(writeMutex, portMAX_DELAY) == pdFALSE) return 0;
+    
+	int n;
+	for(n = 0; n < len; n++) {
+        if(*ptr == '\n') xSerial1PutChar('\r', portMAX_DELAY);
+		xSerial1PutChar(*ptr++, portMAX_DELAY);
+	}
+    
+    xSemaphoreGive(writeMutex);
+
+    return len;
+}
+
+int _read (int file, char *ptr, int count)
+{
+    (void) file;
+    (void) ptr;
+    (void) count;
+    return 0;
+}
+
+/*
+ * Ultra Sonic Sensor simulator
+ */
+static volatile int distance;
+
+
+void Ultra_Start()
+{
+}
+
+int Ultra_GetDistance(void)
+{
+    return distance;       
+}    
+
+
+/*
+ * IR Sensor simulator
+ */
+static volatile int ir_value;
+
+
+void IR_Start(void)
+{
+}
+
+
+/* Flush all previously received IR values */
+void IR_flush(void)
+{
+    ir_value = 0;
+}
+
+/* Wait for a high pulse with length between IR_LOWER_LIMIT and IR_UPPER_LIMIT */
+void IR_wait(void)
+{
+    while(!ir_value) {
+        vTaskDelay(10);
+    }
+    IR_flush();
+}
+
+
+
+/*
+ * Simulator send/receive task
+ */
+
+
+static void send(const char *data, int len) 
+{
+   if(xSemaphoreTake(writeMutex, portMAX_DELAY) == pdFALSE) return;
+
+   while(len-- > 0) {
+        xSerial1PutChar(*data++, 0);
+    }
+
+    xSemaphoreGive(writeMutex);
+}
+
+#define IDLE_TIMEOUT 5
+
+static const char stopped[5] = {0,255,0,0,IDLE_TIMEOUT};
+
+void SimulatorTask( void *pvParameters )
+{
+    (void) pvParameters;
+    SimData sd;
+    char data[5] = {0,255,0,0,IDLE_TIMEOUT};
+    int delay;
+    char sdata[8];
+    int pos = 0;
+    
+
+    while(1) {
+        if(xQueueReceive(motor_q, &sd, IDLE_TIMEOUT) == pdTRUE) {
+            data[0] = (sd.ld ? 0x01 : 0x0) | (sd.rd ? 0x02 : 0x0 );
+            data[1] = ~data[0];
+            data[2] = sd.ls;
+            data[3] = sd.rs;
+            delay = sd.delay;
+        }
+        else {
+            // set new delay, use old motor data
+            delay = IDLE_TIMEOUT;
+        }
+        while(delay > 0) {
+            uint32_t ms = delay > 60 ? 50 : delay;
+            delay -= ms;
+            data[4] = ms;
+            if(motor_started) send(data, 5);
+            else send(stopped, 5);
+            pos = 0;
+            while(pos < 8 && xSerial1GetChar(sdata+pos, 100)) {
+                if(sdata[0] < 32) {
+                    ++pos;
+                }
+            }
+            if(pos == 8 && reflectance_started) {
+                ir_value += sdata[0] & 0x01;
+                distance = sdata[1] & 0x7f;
+                sensors.l3 = sdata[2] * 100;
+                sensors.l2 = sdata[3] * 100;
+                sensors.l1 = sdata[4] * 100;
+                sensors.r1 = sdata[5] * 100;
+                sensors.r2 = sdata[6] * 100;
+                sensors.r3 = sdata[7] * 100;
+            }
+        }
+        
+    }
+}
+
+#endif

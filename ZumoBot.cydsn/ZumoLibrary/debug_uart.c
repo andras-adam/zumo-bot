@@ -60,14 +60,14 @@ void DebugUartTask( void *pvParameters )
 {
     (void) pvParameters; //quiet the compiler warning
     char c;
-    while(1) vTaskDelay(100);
+    //while(1) vTaskDelay(100);
     
     while(true) {
     	if( pdTRUE == xQueueReceive( xSerialTxQueue, &c, portMAX_DELAY ) )
     	{
     		/* Picked up a character. */
             xSemaphoreTake(u1_mutex, portMAX_DELAY);
-            //UART_1_PutChar(c);
+            UART_1_PutChar(c);
             xSemaphoreGive(u1_mutex);
     	}
     }
@@ -101,7 +101,13 @@ int _write(int file, const char *ptr, int len)
 
 void ds(const char *s) 
 {
-    //_write(0, s, strlen(s));   
+	while(*s) {
+        if(*s == '\n') {
+            const char cr = '\r';
+    		xQueueSend( xSerialTxQueue, &cr, portMAX_DELAY); //UART_1_PutChar('\r');
+        }
+		xQueueSend( xSerialTxQueue, s++, portMAX_DELAY); //UART_1_PutChar(*ptr++);
+	}
 }
 
 #define CMD_MAX_SIZE 64
@@ -113,10 +119,7 @@ void DebugCommandTask( void *pvParameters )
     int pos = 0;
 
     while(true) {
-        xSemaphoreTake(u1_mutex, portMAX_DELAY);
-        //c = UART_1_GetChar();
-        c = 0;
-        xSemaphoreGive(u1_mutex);
+        xSerial1GetChar(&c,portMAX_DELAY);
         if(c != 0) {
             if(c == '\n' || c == '\r') {
                 if(pos > 0) {

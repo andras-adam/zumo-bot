@@ -3,6 +3,11 @@
  * @brief Basic methods for operating IR receiver. For more details, please refer to IR.h file. 
  * @details part number: TSOP-2236
 */
+
+#include "zumo_config.h"
+
+#if ZUMO_SIMULATOR == 0
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -83,4 +88,5 @@ void IR_Start(void)
     }
 }
 
+#endif
 

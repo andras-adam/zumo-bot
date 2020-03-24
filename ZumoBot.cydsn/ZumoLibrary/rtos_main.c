@@ -38,6 +38,7 @@
 #include "serial1.h"
 #include "debug_uart.h"
 #include "mqtt_sender.h"
+#include "simulator.h"
 #include "zumo_config.h"
 
 #ifndef START_MQTT
@@ -70,15 +71,19 @@ int main( void )
     /* Task initializations */
     vSerial1PortInitMinimal(256);
     RetargetInit();
-    DebugUartTaskInit();
-    MQTTSendTaskInit();
     
-	/* Start tasks. */
+    //DebugUartTaskInit();
   	//( void ) xTaskCreate( DebugUartTask, "DbgUart", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL );
   	//( void ) xTaskCreate( DebugCommandTask, "DbgCmd", configMINIMAL_STACK_SIZE * 3, NULL, tskIDLE_PRIORITY + 1, NULL );
+    
   	( void ) xTaskCreate( start_zmain, "Zumo", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 1, NULL );
-#if START_MQTT == 1   
+#if START_MQTT == 1
+    MQTTSendTaskInit();
   	( void ) xTaskCreate( MQTTSendTask, "MQTT_send", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
+#endif    
+#if ZUMO_SIMULATOR == 1  
+    SimulatorTaskInit();
+  	( void ) xTaskCreate( SimulatorTask, "Simulator", configMINIMAL_STACK_SIZE * 10, NULL, tskIDLE_PRIORITY + 2, NULL );
 #endif    
     
 	/* Will only get here if there was insufficient memory to create the idle
@@ -94,7 +99,7 @@ int main( void )
 /*---------------------------------------------------------------------------*/
 
 
-
+#if 0
 void __malloc_lock (struct _reent *reent) {
     (void) reent;
     vTaskSuspendAll();
@@ -104,6 +109,7 @@ void __malloc_unlock (struct _reent *reent) {
     (void) reent;
     xTaskResumeAll();
 }
+#endif
 
 void prvHardwareSetup( void )
 {

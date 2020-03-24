@@ -1,3 +1,7 @@
+#include "zumo_config.h"
+
+#if ZUMO_SIMULATOR == 0   
+
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
@@ -14,7 +18,6 @@ void RetargetInit(void)
 
 
 /* Don't remove the functions below */
-// writing is handled in debug_uart task
 int _write(int file, char *ptr, int len)
 {
     (void)file; /* Parameter is not used, suppress unused argument warning */
@@ -111,4 +114,5 @@ int _read (int file, char *ptr, int count)
     }
     return chs;
 }    
+#endif
 #endif

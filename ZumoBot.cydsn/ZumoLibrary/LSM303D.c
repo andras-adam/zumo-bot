@@ -18,6 +18,9 @@
 #include"LSM303D.h"
 #include"I2C.h"
 #include"I2C_Common.h"
+#include "zumo_config.h"
+
+#if ZUMO_SIMULATOR == 0
 
 uint8_t LSM303D_Start(void){
     
@@ -49,6 +52,20 @@ void LSM303D_Read_Acc(struct accData_* data){
     data->accY = (int16)(xyz[3] << 8 | xyz[2]);
     data->accZ = (int16)(xyz[5] << 8 | xyz[4]);
 }
+#else
+uint8_t LSM303D_Start(void)
+{
+    return 1;
+}
+
+void LSM303D_Read_Acc(struct accData_* data){
+    
+    data->accX = 0;
+    data->accY = 0;
+    data->accZ = 0;
+}
+
+#endif
 
 #if 0
 /* Example of how to use this Accelerometer!!!*/

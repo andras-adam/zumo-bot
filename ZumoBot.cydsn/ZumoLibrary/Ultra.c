@@ -3,6 +3,12 @@
  * @brief   Basic methods for operating ultrasonic sensor. For more details, please refer to Ultra.h file. 
  * @details part number: HC-SR04
 */
+
+#include "zumo_config.h"
+
+#if ZUMO_SIMULATOR == 0
+
+
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -101,6 +107,6 @@ int Ultra_GetDistance(void)
     return distance;       
 }    
 
-
+#endif
 
 
