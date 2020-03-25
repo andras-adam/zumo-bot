@@ -24,7 +24,7 @@ void SimulatorTaskInit(void)
 static void send(const char *data, int len) ;
     
 #define RUN_TIMEOUT 5
-#define STOP_TIMEOUT 100
+#define STOP_TIMEOUT 25
 
 static const char stopped[5] = {0,255,0,0,RUN_TIMEOUT};
 
