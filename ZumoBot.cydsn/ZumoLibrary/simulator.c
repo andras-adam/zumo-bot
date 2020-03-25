@@ -21,7 +21,13 @@ void SimulatorTaskInit(void)
 }
 
 #if ZUMO_SIMULATOR == 1
+static void send(const char *data, int len) ;
     
+#define RUN_TIMEOUT 5
+#define STOP_TIMEOUT 100
+
+static const char stopped[5] = {0,255,0,0,RUN_TIMEOUT};
+
 static volatile int motor_started;    
 /*
  * Motor simulator
@@ -29,7 +35,9 @@ static volatile int motor_started;
 void SetMotors(uint8 left_dir, uint8 right_dir, uint8 left_speed, uint8 right_speed, uint32 delay)
 {
     SimData sim = { left_dir, right_dir, left_speed, right_speed, delay };
-    if(delay < 2) sim.delay = 2;
+    if(delay < 2) {
+        sim.delay = 2;
+    }
     xQueueSend(motor_q, &sim, 0);
     vTaskDelay(delay);
 }
@@ -52,6 +60,7 @@ void motor_start()
 void motor_stop()
 {
     motor_started = 0;
+    send(stopped, 5);
 }
 
 /*
@@ -225,22 +234,25 @@ static void send(const char *data, int len)
     xSemaphoreGive(writeMutex);
 }
 
-#define IDLE_TIMEOUT 5
-
-static const char stopped[5] = {0,255,0,0,IDLE_TIMEOUT};
 
 void SimulatorTask( void *pvParameters )
 {
     (void) pvParameters;
-    SimData sd;
-    char data[5] = {0,255,0,0,IDLE_TIMEOUT};
-    int delay;
+    SimData sd = { 0, 0, 0, 0, 0 };
+    char data[5] = {0,255,0,0,RUN_TIMEOUT};
+    uint32_t delay;
     char sdata[8];
     int pos = 0;
-    
+    TickType_t wait_time = RUN_TIMEOUT;
 
     while(1) {
-        if(xQueueReceive(motor_q, &sd, IDLE_TIMEOUT) == pdTRUE) {
+        if(sd.ls == 0 && sd.rs == 0) {
+            wait_time = STOP_TIMEOUT;
+        }
+        else {
+            wait_time = RUN_TIMEOUT;
+        }
+        if(xQueueReceive(motor_q, &sd, wait_time) == pdTRUE) {
             data[0] = (sd.ld ? 0x01 : 0x0) | (sd.rd ? 0x02 : 0x0 );
             data[1] = ~data[0];
             data[2] = sd.ls;
@@ -249,14 +261,14 @@ void SimulatorTask( void *pvParameters )
         }
         else {
             // set new delay, use old motor data
-            delay = IDLE_TIMEOUT;
+            delay = RUN_TIMEOUT;
         }
-        while(delay > 0) {
-            uint32_t ms = delay > 60 ? 50 : delay;
+        TickType_t LastWakeTime = xTaskGetTickCount();
+        while(motor_started && delay > 0) {
+            uint32_t ms = (delay > 60) ? 50 : delay;
             delay -= ms;
             data[4] = ms;
-            if(motor_started) send(data, 5);
-            else send(stopped, 5);
+            send(data, 5);
             pos = 0;
             while(pos < 8 && xSerial1GetChar(sdata+pos, 100)) {
                 if(sdata[0] < 32) {
@@ -273,6 +285,7 @@ void SimulatorTask( void *pvParameters )
                 sensors.r2 = sdata[6] * 100;
                 sensors.r3 = sdata[7] * 100;
             }
+            vTaskDelayUntil( &LastWakeTime, ms );
         }
         
     }
