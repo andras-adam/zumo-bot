@@ -178,10 +178,12 @@ int _read (int file, char *ptr, int count)
  * Ultra Sonic Sensor simulator
  */
 static volatile int distance;
+static volatile int ultra_started;
 
 
 void Ultra_Start()
 {
+    ultra_started = 1;
 }
 
 int Ultra_GetDistance(void)
@@ -275,15 +277,19 @@ void SimulatorTask( void *pvParameters )
                     ++pos;
                 }
             }
-            if(pos == 8 && reflectance_started) {
+            if(pos == 8 ) {
                 ir_value += sdata[0] & 0x01;
-                distance = sdata[1] & 0x7f;
-                sensors.l3 = sdata[2] * 100;
-                sensors.l2 = sdata[3] * 100;
-                sensors.l1 = sdata[4] * 100;
-                sensors.r1 = sdata[5] * 100;
-                sensors.r2 = sdata[6] * 100;
-                sensors.r3 = sdata[7] * 100;
+                if(ultra_started) {
+                    distance = sdata[1] & 0x7f;
+                }
+                if(reflectance_started) {
+                    sensors.l3 = sdata[2] * 100;
+                    sensors.l2 = sdata[3] * 100;
+                    sensors.l1 = sdata[4] * 100;
+                    sensors.r1 = sdata[5] * 100;
+                    sensors.r2 = sdata[6] * 100;
+                    sensors.r3 = sdata[7] * 100;
+                }
             }
             vTaskDelayUntil( &LastWakeTime, ms );
         }
