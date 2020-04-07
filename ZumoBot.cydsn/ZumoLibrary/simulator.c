@@ -248,25 +248,37 @@ void SimulatorTask( void *pvParameters )
     TickType_t wait_time = RUN_TIMEOUT;
 
     while(1) {
-        if(sd.ls == 0 && sd.rs == 0) {
+        // reduce communication interval if speed is zero or motors are stopped
+        if((sd.ls == 0 && sd.rs == 0) || !motor_started) {
             wait_time = STOP_TIMEOUT;
         }
         else {
             wait_time = RUN_TIMEOUT;
         }
         if(xQueueReceive(motor_q, &sd, wait_time) == pdTRUE) {
+            // motor speed data was updated get speed from the updated data
+            delay = sd.delay;
+        }
+        else {
+            // no new speed data was received
+            // set new delay, use old motor data
+            delay = RUN_TIMEOUT;
+        }
+        if(motor_started) {
+            // motors are running take speed from current settings
             data[0] = (sd.ld ? 0x01 : 0x0) | (sd.rd ? 0x02 : 0x0 );
             data[1] = ~data[0];
             data[2] = sd.ls;
             data[3] = sd.rs;
-            delay = sd.delay;
         }
         else {
-            // set new delay, use old motor data
-            delay = RUN_TIMEOUT;
+            // if motors haven't been started force speed to zero
+            data[2] = 0;
+            data[3] = 0;
         }
+        
         TickType_t LastWakeTime = xTaskGetTickCount();
-        while(motor_started && delay > 0) {
+        while(delay > 0) {
             uint32_t ms = (delay > 60) ? 50 : delay;
             delay -= ms;
             data[4] = ms;
