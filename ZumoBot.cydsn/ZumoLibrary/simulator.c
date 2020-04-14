@@ -11,7 +11,7 @@
 #include "Reflectance.h"
 #include "Ultra.h"
 #include "IR.h"
-
+#include <stdio.h>
 
 static QueueHandle_t motor_q;
 
@@ -35,6 +35,9 @@ static volatile int motor_started;
 void SetMotors(uint8 left_dir, uint8 right_dir, uint8 left_speed, uint8 right_speed, uint32 delay)
 {
     SimData sim = { left_dir, right_dir, left_speed, right_speed, delay };
+    if(!motor_started) {
+        printf("You haven't started motors\n");
+    }
     if(delay < 2) {
         sim.delay = 2;
     }
@@ -86,6 +89,9 @@ void reflectance_start()
 */
 void reflectance_read(struct sensors_ *values)
 {
+    if(!reflectance_started) {
+        printf("You haven't started reflectance sensor\n");
+    }
     *values = sensors;
 }
 
@@ -95,6 +101,9 @@ void reflectance_read(struct sensors_ *values)
 */
 void reflectance_digital(struct sensors_ *digital)
 {
+    if(!reflectance_started) {
+        printf("You haven't started reflectance sensor\n");
+    }
     //if the results of reflectance_period function is over threshold, set digital_sensor_value to 1, which means it's black
     if(sensors.l3 < threshold.l3)
         digital->l3 = 0;
@@ -188,6 +197,9 @@ void Ultra_Start()
 
 int Ultra_GetDistance(void)
 {
+    if(!ultra_started) {
+        printf("You haven't started ultrasonic sensor\n");
+    }
     return distance;       
 }    
 
@@ -196,22 +208,30 @@ int Ultra_GetDistance(void)
  * IR Sensor simulator
  */
 static volatile int ir_value;
+static volatile int ir_started;
 
 
 void IR_Start(void)
 {
+    ir_started = 1;
 }
 
 
 /* Flush all previously received IR values */
 void IR_flush(void)
 {
+    if(!ir_started) {
+        printf("You haven't started IR sensor\n");
+    }
     ir_value = 0;
 }
 
 /* Wait for a high pulse with length between IR_LOWER_LIMIT and IR_UPPER_LIMIT */
 void IR_wait(void)
 {
+    if(!ir_started) {
+        printf("You haven't started IR sensor\n");
+    }
     while(!ir_value) {
         vTaskDelay(10);
     }
