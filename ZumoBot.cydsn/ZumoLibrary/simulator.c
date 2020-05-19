@@ -41,7 +41,7 @@ void SetMotors(uint8 left_dir, uint8 right_dir, uint8 left_speed, uint8 right_sp
     if(delay < 2) {
         sim.delay = 2;
     }
-    xQueueSend(motor_q, &sim, 0);
+    xQueueSend(motor_q, &sim, portMAX_DELAY);
     vTaskDelay(delay);
 }
 
