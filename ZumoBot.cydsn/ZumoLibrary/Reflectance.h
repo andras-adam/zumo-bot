@@ -12,17 +12,17 @@
 * @details  raw value of Reflectance Sensor
 */
 struct sensors_ {
-    uint16_t l3;
-    uint16_t l2; 
-    uint16_t l1;
-    uint16_t r1;
-    uint16_t r2;
-    uint16_t r3;
+    uint16_t L3;
+    uint16_t L2; 
+    uint16_t L1;
+    uint16_t R1;
+    uint16_t R2;
+    uint16_t R3;
 };
 
 void reflectance_start(void);
 void reflectance_read(struct sensors_ *values);
 void reflectance_digital(struct sensors_ *digital);
-void reflectance_set_threshold(uint16_t l3, uint16_t l2, uint16_t l1, uint16_t r1, uint16_t r2, uint16_t r3);
+void reflectance_set_threshold(uint16_t L3, uint16_t L2, uint16_t L1, uint16_t R1, uint16_t R2, uint16_t R3);
 
 #endif

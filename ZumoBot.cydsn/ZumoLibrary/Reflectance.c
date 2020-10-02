@@ -46,45 +46,45 @@ void ReflectanceTask( void *pvParameters )
         statusL1 = Timer_L1_ReadStatusRegister();
 
         if(statusR1 & Timer_R1_STATUS_CAPTURE) {
-            sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCapture();
+            sensors.R1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCapture();
         }
         else {
-            sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCounter();
+            sensors.R1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCounter();
         }
         
         if(statusL1 & Timer_L1_STATUS_CAPTURE) {
-            sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCapture();
+            sensors.L1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCapture();
         }
         else {
-            sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCounter();
+            sensors.L1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCounter();
         }
 
         if(statusR2 & Timer_R2_STATUS_CAPTURE) {
-            sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCapture();
+            sensors.R2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCapture();
         }
         else {
-            sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCounter();
+            sensors.R2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCounter();
         }
         
         if(statusL2 & Timer_L2_STATUS_CAPTURE) {
-            sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCapture();
+            sensors.L2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCapture();
         }
         else {
-            sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCounter();
+            sensors.L2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCounter();
         }
         
         if(statusR3 & Timer_R3_STATUS_CAPTURE) {
-            sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCapture();
+            sensors.R3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCapture();
         }
         else {
-            sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCounter();
+            sensors.R3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCounter();
         }
         
         if(statusL3 & Timer_L3_STATUS_CAPTURE) {
-            sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCapture();
+            sensors.L3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCapture();
         }
         else {
-            sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCounter();
+            sensors.L3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCounter();
         }
         
         
@@ -154,46 +154,46 @@ void reflectance_read(struct sensors_ *values)
 void reflectance_digital(struct sensors_ *digital)
 {
     //if the results of reflectance_period function is over threshold, set digital_sensor_value to 1, which means it's black
-    if(sensors.l3 < threshold.l3)
-        digital->l3 = 0;
+    if(sensors.L3 < threshold.L3)
+        digital->L3 = 0;
     else
-        digital->l3 = 1;
+        digital->L3 = 1;
     
-    if(sensors.l2 < threshold.l2)
-        digital->l2 = 0;
+    if(sensors.L2 < threshold.L2)
+        digital->L2 = 0;
     else
-        digital->l2 = 1;
+        digital->L2 = 1;
     
-    if(sensors.l1 < threshold.l1)
-        digital->l1 = 0;
+    if(sensors.L1 < threshold.L1)
+        digital->L1 = 0;
     else
-        digital->l1 = 1;
+        digital->L1 = 1;
     
-    if(sensors.r1 < threshold.r1)
-        digital->r1 = 0;
+    if(sensors.R1 < threshold.R1)
+        digital->R1 = 0;
     else
-        digital->r1 = 1;
+        digital->R1 = 1;
     
-    if(sensors.r2 < threshold.r2)
-        digital->r2 = 0;
+    if(sensors.R2 < threshold.R2)
+        digital->R2 = 0;
     else
-        digital->r2 = 1;
+        digital->R2 = 1;
     
-    if(sensors.r3 < threshold.r3)
-        digital->r3 = 0;
+    if(sensors.R3 < threshold.R3)
+        digital->R3 = 0;
     else
-        digital->r3 = 1;
+        digital->R3 = 1;
         
 }
 
-void reflectance_set_threshold(uint16_t l3, uint16_t l2, uint16_t l1, uint16_t r1, uint16_t r2, uint16_t r3)
+void reflectance_set_threshold(uint16_t L3, uint16_t L2, uint16_t L1, uint16_t R1, uint16_t R2, uint16_t R3)
 {
-    threshold.l3 = l3;
-    threshold.l2 = l2;
-    threshold.l1 = l1;
-    threshold.r3 = r3;
-    threshold.r2 = r2;
-    threshold.r1 = r1;
+    threshold.L3 = L3;
+    threshold.L2 = L2;
+    threshold.L1 = L1;
+    threshold.R3 = R3;
+    threshold.R2 = R2;
+    threshold.R1 = R1;
 }
 
 

@@ -105,46 +105,46 @@ void reflectance_digital(struct sensors_ *digital)
         printf("You haven't started reflectance sensor\n");
     }
     //if the results of reflectance_period function is over threshold, set digital_sensor_value to 1, which means it's black
-    if(sensors.l3 < threshold.l3)
-        digital->l3 = 0;
+    if(sensors.L3 < threshold.L3)
+        digital->L3 = 0;
     else
-        digital->l3 = 1;
+        digital->L3 = 1;
     
-    if(sensors.l2 < threshold.l2)
-        digital->l2 = 0;
+    if(sensors.L2 < threshold.L2)
+        digital->L2 = 0;
     else
-        digital->l2 = 1;
+        digital->L2 = 1;
     
-    if(sensors.l1 < threshold.l1)
-        digital->l1 = 0;
+    if(sensors.L1 < threshold.L1)
+        digital->L1 = 0;
     else
-        digital->l1 = 1;
+        digital->L1 = 1;
     
-    if(sensors.r1 < threshold.r1)
-        digital->r1 = 0;
+    if(sensors.R1 < threshold.R1)
+        digital->R1 = 0;
     else
-        digital->r1 = 1;
+        digital->R1 = 1;
     
-    if(sensors.r2 < threshold.r2)
-        digital->r2 = 0;
+    if(sensors.R2 < threshold.R2)
+        digital->R2 = 0;
     else
-        digital->r2 = 1;
+        digital->R2 = 1;
     
-    if(sensors.r3 < threshold.r3)
-        digital->r3 = 0;
+    if(sensors.R3 < threshold.R3)
+        digital->R3 = 0;
     else
-        digital->r3 = 1;
+        digital->R3 = 1;
         
 }
 
-void reflectance_set_threshold(uint16_t l3, uint16_t l2, uint16_t l1, uint16_t r1, uint16_t r2, uint16_t r3)
+void reflectance_set_threshold(uint16_t L3, uint16_t L2, uint16_t L1, uint16_t R1, uint16_t R2, uint16_t R3)
 {
-    threshold.l3 = l3;
-    threshold.l2 = l2;
-    threshold.l1 = l1;
-    threshold.r3 = r3;
-    threshold.r2 = r2;
-    threshold.r1 = r1;
+    threshold.L3 = L3;
+    threshold.L2 = L2;
+    threshold.L1 = L1;
+    threshold.R3 = R3;
+    threshold.R2 = R2;
+    threshold.R1 = R1;
 }
 
 /*
@@ -315,12 +315,12 @@ void SimulatorTask( void *pvParameters )
                     distance = sdata[1] & 0x7f;
                 }
                 if(reflectance_started) {
-                    sensors.l3 = sdata[2] * 100;
-                    sensors.l2 = sdata[3] * 100;
-                    sensors.l1 = sdata[4] * 100;
-                    sensors.r1 = sdata[5] * 100;
-                    sensors.r2 = sdata[6] * 100;
-                    sensors.r3 = sdata[7] * 100;
+                    sensors.L3 = sdata[2] * 100;
+                    sensors.L2 = sdata[3] * 100;
+                    sensors.L1 = sdata[4] * 100;
+                    sensors.R1 = sdata[5] * 100;
+                    sensors.R2 = sdata[6] * 100;
+                    sensors.R3 = sdata[7] * 100;
                 }
             }
             vTaskDelayUntil( &LastWakeTime, ms );

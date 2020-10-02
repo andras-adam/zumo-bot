@@ -129,6 +129,7 @@ void zmain(void)
  }   
 #endif
 
+
 #if 0
 // button
 void zmain(void)
@@ -229,6 +230,10 @@ void zmain(void)
 
 #if 0
 //IR receiver - read raw data
+// RAW data is used when you know how your remote modulates data and you want to be able detect 
+// which button was actually pressed. Typical remote control protocols requires a protocol specific
+// state machine to decode button presses. Writing such a state machine is not trivial and requires
+// that you have the specification of your remotes modulation and communication protocol    
 void zmain(void)
 {
     IR_Start();
@@ -270,13 +275,13 @@ void zmain(void)
         // read raw sensor values
         reflectance_read(&ref);
         // print out each period of reflectance sensors
-        printf("%5d %5d %5d %5d %5d %5d\r\n", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);       
+        printf("%5d %5d %5d %5d %5d %5d\r\n", ref.L3, ref.L2, ref.L1, ref.R1, ref.R2, ref.R3);       
         
         // read digital values that are based on threshold. 0 = white, 1 = black
         // when blackness value is over threshold the sensors reads 1, otherwise 0
         reflectance_digital(&dig); 
         //print out 0 or 1 according to results of reflectance period
-        printf("%5d %5d %5d %5d %5d %5d \r\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);        
+        printf("%5d %5d %5d %5d %5d %5d \r\n", dig.L3, dig.L2, dig.L1, dig.R1, dig.R2, dig.R3);        
         
         vTaskDelay(200);
     }
@@ -385,11 +390,11 @@ void zmain(void)
             printf("Acc: %8d %8d %8d\n",data.accX, data.accY, data.accZ);
             print_mqtt("Zumo01/acc", "%d,%d,%d", data.accX, data.accY, data.accZ);
             reflectance_read(&ref);
-            printf("Ref: %8d %8d %8d %8d %8d %8d\n", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);       
-            print_mqtt("Zumo01/ref", "%d,%d,%d,%d,%d,%d", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);
+            printf("Ref: %8d %8d %8d %8d %8d %8d\n", ref.L3, ref.L2, ref.L1, ref.R1, ref.R2, ref.R3);       
+            print_mqtt("Zumo01/ref", "%d,%d,%d,%d,%d,%d", ref.L3, ref.L2, ref.L1, ref.R1, ref.R2, ref.R3);
             reflectance_digital(&dig);
-            printf("Dig: %8d %8d %8d %8d %8d %8d\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
-            print_mqtt("Zumo01/dig", "%d,%d,%d,%d,%d,%d", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
+            printf("Dig: %8d %8d %8d %8d %8d %8d\n", dig.L3, dig.L2, dig.L1, dig.R1, dig.R2, dig.R3);
+            print_mqtt("Zumo01/dig", "%d,%d,%d,%d,%d,%d", dig.L3, dig.L2, dig.L1, dig.R1, dig.R2, dig.R3);
             ctr = 0;
         }
         vTaskDelay(10);
