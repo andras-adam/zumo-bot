@@ -129,6 +129,27 @@ void zmain(void)
  }   
 #endif
 
+#if 0 
+
+//Tick Timer Example
+void zmain(void) 
+{
+	TickType_t Ttime = xTaskGetTickCount();
+	TickType_t PreviousTtime = 0;
+
+	while(true) 
+	{
+		while(SW1_Read()) vTaskDelay(1); // loop until user presses button
+		Ttime = xTaskGetTickCount(); // take button press time
+		/*Print out the time between button presses in seconds. int cast used to suppress warning messages*/
+		printf("The amount of time between button presses is: %d.%d seconds\n", (int)(Ttime-PreviousTtime)/1000%60, (int)(Ttime-PreviousTtime)%1000);
+		while(!SW1_Read())vTaskDelay(1); // loop while user is pressing the button
+		PreviousTtime = Ttime; // remember previous press time
+	}
+	
+}
+
+#endif
 
 #if 0
 // button
@@ -136,20 +157,21 @@ void zmain(void)
 {
     while(true) {
         printf("Press button within 5 seconds!\n");
-        int i = 50;
-        while(i > 0) {
-            if(SW1_Read() == 0) {
+	    TickType_t Ttime = xTaskGetTickCount(); // take start time
+        bool timeout = false;
+        while(SW1_Read() == 1) {
+            if(xTaskGetTickCount() - Ttime > 5000U) { // too long time since start
+                timeout = true;
                 break;
             }
-            vTaskDelay(100);
-            --i;
+            vTaskDelay(10);
         }
-        if(i > 0) {
-            printf("Good work\n");
-            while(SW1_Read() == 0) vTaskDelay(10); // wait until button is released
+        if(timeout) {
+            printf("You didn't press the button\n");
         }
         else {
-            printf("You didn't press the button\n");
+            printf("Good work\n");
+            while(SW1_Read() == 0) vTaskDelay(10); // wait until button is released
         }
     }
 }
