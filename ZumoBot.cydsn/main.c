@@ -29,15 +29,16 @@
     </p>
 */
 
-
 #include <vasilydavydov.h>
+#include <andras.h>
+
 /**
  * @file    main.c
  * @brief   
  * @details  ** Enable global interrupt since Zumo library uses interrupts. **<br>&nbsp;&nbsp;&nbsp;CyGlobalIntEnable;<br>
 */
 
-#if 0
+#if 1
 // Hello World!
 void zmain(void)
 {
@@ -50,7 +51,7 @@ void zmain(void)
  }   
 #endif
 
-#if 1
+#if 0
 // Name and age
 void zmain(void)
 {
