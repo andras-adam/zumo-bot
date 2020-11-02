@@ -11,7 +11,7 @@
 */
 #include <vasilydavydov.h>
 
-void vPrint(){
+void vPrinter(){
 printf("Hello VAsily!");
 while(true){
 vTaskDelay(100);

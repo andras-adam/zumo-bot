@@ -50,7 +50,23 @@ void zmain(void)
  }   
 #endif
 
+
+
 #if 1
+    
+   void zmain(void){
+ printf("\nHello, Vasily!\n");
+
+    while(true)
+    {
+        vTaskDelay(100); // sleep (in an infinite loop)
+    }
+ }  
+
+#endif
+
+
+#if 0
 // Name and age
 void zmain(void)
 {
