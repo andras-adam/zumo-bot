@@ -29,31 +29,15 @@
     </p>
 */
 
-#include <project.h>
-#include <stdio.h>
-#include "FreeRTOS.h"
-#include "task.h"
-#include "Motor.h"
-#include "Ultra.h"
-#include "Nunchuk.h"
-#include "Reflectance.h"
-#include "Gyro.h"
-#include "Accel_magnet.h"
-#include "LSM303D.h"
-#include "IR.h"
-#include "Beep.h"
-#include "mqtt_sender.h"
-#include <time.h>
-#include <sys/time.h>
-#include "serial1.h"
-#include <unistd.h>
+
+#include <vasilydavydov.h>
 /**
  * @file    main.c
  * @brief   
  * @details  ** Enable global interrupt since Zumo library uses interrupts. **<br>&nbsp;&nbsp;&nbsp;CyGlobalIntEnable;<br>
 */
 
-#if 1
+#if 0
 // Hello World!
 void zmain(void)
 {
@@ -66,7 +50,7 @@ void zmain(void)
  }   
 #endif
 
-#if 0
+#if 1
 // Name and age
 void zmain(void)
 {
