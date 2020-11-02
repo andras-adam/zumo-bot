@@ -11,5 +11,12 @@
 */
 #include <vasilydavydov.h>
 
+void vPrint(){
+printf("Hello VAsily!");
+while(true){
+vTaskDelay(100);
+}
 
+
+}
 /* [] END OF FILE */
