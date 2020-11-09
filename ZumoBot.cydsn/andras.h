@@ -12,6 +12,7 @@
 
 #include <project.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "Motor.h"
@@ -28,5 +29,12 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+
+void assignment_1(void);
+void assignment_2(void);
+void assignment_3(void);
+void assignment_4(void);
+
+void tank_turn(int16 angle);
 
 /* [] END OF FILE */
