@@ -161,6 +161,65 @@ void assignment_4(void) {
 
 }
 
+// Function for assignment 2/2
+void assignment_5(void) {
+
+     struct sensors_ sensors;
+    int count = 0;
+    int touching = 0;
+    
+    // Start up robot
+    printf("\nStarting up.\n");
+    motor_start();
+    motor_forward(0, 0);
+    IR_Start();
+    IR_flush();
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    
+    // Wait for start button
+    printf("\nPress start.\n");
+    BatteryLed_Write(1);
+    while(SW1_Read() == 1);
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    // Navigate track
+    while (count < 2) {
+        reflectance_digital(&sensors);
+        if (sensors.R2 == 1 && sensors.L2 == 0) {
+            while (sensors.R2 == 1) {
+                reflectance_digital(&sensors);
+                tank_turn(-1);
+            }
+        } else if (sensors.L2 == 1 && sensors.R2 == 0) {
+            while (sensors.L2 == 1) {
+                reflectance_digital(&sensors);
+                tank_turn(1);
+            }
+        } else {
+            motor_forward(255, 10);
+//            if (touching != 1 && (sensors.L3 == 1 && sensors.L2 == 1 && sensors.L1 == 1 && sensors.R1 == 1 && sensors.R2 == 1 && sensors.R1 == 1)) {
+//                touching = 1;
+//                count++;
+//                if (count == 1) {
+//                    printf("\nWaiting for IR.\n");
+//                    motor_forward(0, 0);
+//                    IR_wait();
+//                    printf("\nIR signal received.\n");
+//                }
+//            } else if (touching == 1 && (sensors.L3 == 0 || sensors.L2 == 0 || sensors.L1 == 0 || sensors.R1 == 0 || sensors.R2 == 0 || sensors.R1 == 0)) {
+//                touching = 0;
+//            }
+        }
+    }
+    
+    // Shut down robot
+    printf("\nShutting down.\n");
+    motor_stop();
+
+}
+
 // Tank turn by x degrees
 void tank_turn(int16 angle) {
 
@@ -169,7 +228,7 @@ void tank_turn(int16 angle) {
     
     uint8 angle_corrected = ((angle < 0) ? angle * -1 : angle) % 360;
     
-    uint32 delay = (angle_corrected * 1048) / 360; // 1048 delay is ~a whole turn at 100 speed
+    uint32 delay = (angle_corrected * 1048) / 360; // 1048 delay is ~a whole turn at 200 speed
     
     SetMotors(left_dir, right_dir, 100, 100, delay);
     

@@ -34,6 +34,7 @@ void assignment_1(void);
 void assignment_2(void);
 void assignment_3(void);
 void assignment_4(void);
+void assignment_5(void);
 
 void tank_turn(int16 angle);
 
