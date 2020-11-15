@@ -139,7 +139,7 @@ void assignment_4(void) {
     
     // Navigate track
     while (count < 5) {
-        reflectance_digital(&sensors);   
+        reflectance_digital(&sensors);
         if (touching != 1 && sensors.L3 == 1 && sensors.L2 == 1 && sensors.L1 == 1 && sensors.R1 == 1 && sensors.R2 == 1 && sensors.R1 == 1) {
             touching = 1;
             count++;
@@ -175,7 +175,7 @@ void assignment_5(void) {
     IR_Start();
     IR_flush();
     reflectance_start();
-    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
     
     // Wait for start button
     printf("\nPress start.\n");
@@ -199,18 +199,18 @@ void assignment_5(void) {
             }
         } else {
             motor_forward(255, 10);
-//            if (touching != 1 && (sensors.L3 == 1 && sensors.L2 == 1 && sensors.L1 == 1 && sensors.R1 == 1 && sensors.R2 == 1 && sensors.R1 == 1)) {
-//                touching = 1;
-//                count++;
-//                if (count == 1) {
-//                    printf("\nWaiting for IR.\n");
-//                    motor_forward(0, 0);
-//                    IR_wait();
-//                    printf("\nIR signal received.\n");
-//                }
-//            } else if (touching == 1 && (sensors.L3 == 0 || sensors.L2 == 0 || sensors.L1 == 0 || sensors.R1 == 0 || sensors.R2 == 0 || sensors.R1 == 0)) {
-//                touching = 0;
-//            }
+            if (touching == 0 && sensors.L3 == 1 && sensors.L2 == 1 && sensors.L1 == 1 && sensors.R1 == 1 && sensors.R2 == 1 && sensors.R1 == 1) {
+                touching = 1;
+                count++;
+                if (count == 1) {
+                    printf("\nWaiting for IR.\n");
+                    motor_forward(0, 0);
+                    IR_wait();
+                    printf("\nIR signal received.\n");
+                }
+            } else if (touching == 1 && (sensors.L3 == 0 || sensors.L2 == 0 || sensors.L1 == 0 || sensors.R1 == 0 || sensors.R2 == 0 || sensors.R1 == 0)) {
+                touching = 0;
+            }
         }
     }
     

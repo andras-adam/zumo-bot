@@ -43,6 +43,8 @@
 void zmain(void)
 {
     printf("\nHello, World!\n");
+    
+    assignment_5();
 
     while(true)
     {
