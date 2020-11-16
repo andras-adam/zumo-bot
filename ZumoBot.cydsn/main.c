@@ -44,7 +44,7 @@ void zmain(void)
 {
     printf("\nHello, World!\n");
     
-    assignment_5();
+    assignment_6();
 
     while(true)
     {

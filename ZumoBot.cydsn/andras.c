@@ -164,7 +164,7 @@ void assignment_4(void) {
 // Function for assignment 2/2
 void assignment_5(void) {
 
-     struct sensors_ sensors;
+    struct sensors_ sensors;
     int count = 0;
     int touching = 0;
     
@@ -218,6 +218,109 @@ void assignment_5(void) {
     printf("\nShutting down.\n");
     motor_stop();
 
+}
+
+// Function for assignment 2/3
+void assignment_6(void) {
+
+    struct sensors_ sensors;
+    int count = 0;
+    int touching = 0;
+    
+    // Start up robot
+    printf("\nStarting up.\n");
+    motor_start();
+    motor_forward(0, 0);
+    IR_Start();
+    IR_flush();
+    reflectance_start();
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+    
+    // Wait for start button
+    printf("\nPress start.\n");
+    BatteryLed_Write(1);
+    while(SW1_Read() == 1);
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    // Navigate track
+    while (count < 3) {
+        reflectance_digital(&sensors);
+        
+        follow_line(&sensors, 255, 10);
+        
+        printf("\nLine followed\n");
+        
+        if (touching == 0 && sensor_AND(&sensors, 1, 1, 1, 1, 1, 1)) {
+            touching = 1;
+            count++;
+            if (count == 1) {
+                printf("\nWaiting for IR.\n");
+                motor_forward(0, 0);
+                IR_wait();
+                printf("\nIR signal received.\n");
+            } else if (count == 2) {
+                break;
+                while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
+                    reflectance_digital(&sensors);
+                    motor_turn(0, 200, 10);
+                }
+            }
+        } else if (touching == 1 && sensor_OR(&sensors, 0, 0, 0, 0, 0, 0)) {
+            touching = 0;
+        }
+    }
+    
+    // Shut down robot
+    printf("\nShutting down.\n");
+    motor_stop();
+
+}
+
+// Follow a line until the next intersection
+void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay) {
+    
+    // Leave intersection forward
+    while (sensor_AND(sensors, 1, 1, 1, 1, 1, 1)) {
+        motor_forward(speed, delay);
+        reflectance_digital(sensors);
+    }
+    
+    // Follow line until next intersection
+    while (sensor_AND(sensors, 0, 0, 1, 1, 0, 0)) {
+        if (sensors->R2 == 1 && sensors->L2 == 0) {
+            while (sensors->R2 == 1) {
+                reflectance_digital(sensors);
+                tank_turn(-1);
+            }
+        } else if (sensors->L2 == 1 && sensors->R2 == 0) {
+            while (sensors->L2 == 1) {
+                reflectance_digital(sensors);
+                tank_turn(1);
+            }
+        } else {
+            motor_forward(speed, delay);
+        }
+        reflectance_digital(sensors);
+    }
+}
+
+// Compare sensor values with AND
+int sensor_AND(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3) {
+    if (sensors->L3 == L3 && sensors->L2 == L2 && sensors->L1 == L1 && sensors->R1 == R1 && sensors->R2 == R2 && sensors->R3 == R3) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// Compare sensor values with OR
+int sensor_OR(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3) {
+    if (sensors->L3 == L3 || sensors->L2 == L2 || sensors->L1 == L1 || sensors->R1 == R1 || sensors->R2 == R2 || sensors->R3 == R3) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // Tank turn by x degrees
