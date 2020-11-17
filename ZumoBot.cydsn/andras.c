@@ -225,7 +225,6 @@ void assignment_6(void) {
 
     struct sensors_ sensors;
     int count = 0;
-    int touching = 0;
     
     // Start up robot
     printf("\nStarting up.\n");
@@ -244,30 +243,24 @@ void assignment_6(void) {
     vTaskDelay(1000);
     
     // Navigate track
-    while (count < 3) {
-        reflectance_digital(&sensors);
-        
+    while (count < 5) {
         follow_line(&sensors, 255, 10);
-        
-        printf("\nLine followed\n");
-        
-        if (touching == 0 && sensor_AND(&sensors, 1, 1, 1, 1, 1, 1)) {
-            touching = 1;
-            count++;
-            if (count == 1) {
-                printf("\nWaiting for IR.\n");
-                motor_forward(0, 0);
-                IR_wait();
-                printf("\nIR signal received.\n");
-            } else if (count == 2) {
-                break;
-                while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
-                    reflectance_digital(&sensors);
-                    motor_turn(0, 200, 10);
-                }
+        count++;
+        if (count == 1) {
+            printf("\nWaiting for IR.\n");
+            motor_forward(0, 0);
+            IR_wait();
+            printf("\nIR signal received.\n");
+        } else if (count == 2) {
+            while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
+                motor_turn(0, 200, 10);
+                reflectance_digital(&sensors);
             }
-        } else if (touching == 1 && sensor_OR(&sensors, 0, 0, 0, 0, 0, 0)) {
-            touching = 0;
+        } else if (count == 3 || count == 4) {
+            while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
+                motor_turn(200, 0, 10);
+                reflectance_digital(&sensors);
+            }
         }
     }
     
@@ -279,6 +272,7 @@ void assignment_6(void) {
 
 // Follow a line until the next intersection
 void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay) {
+    reflectance_digital(sensors);
     
     // Leave intersection forward
     while (sensor_AND(sensors, 1, 1, 1, 1, 1, 1)) {
@@ -287,20 +281,16 @@ void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay) {
     }
     
     // Follow line until next intersection
-    while (sensor_AND(sensors, 0, 0, 1, 1, 0, 0)) {
-        if (sensors->R2 == 1 && sensors->L2 == 0) {
-            while (sensors->R2 == 1) {
-                reflectance_digital(sensors);
-                tank_turn(-1);
-            }
-        } else if (sensors->L2 == 1 && sensors->R2 == 0) {
-            while (sensors->L2 == 1) {
-                reflectance_digital(sensors);
-                tank_turn(1);
-            }
-        } else {
-            motor_forward(speed, delay);
+    while (!sensor_AND(sensors, 1, 1, 1, 1, 1, 1)) {
+        while (sensors->R2 == 1 && sensors->L2 == 0) {
+            tank_turn(-1);
+            reflectance_digital(sensors);
         }
+        while (sensors->L2 == 1 && sensors->R2 == 0) {
+            tank_turn(1);
+            reflectance_digital(sensors);
+        }
+        motor_forward(speed, delay);
         reflectance_digital(sensors);
     }
 }
