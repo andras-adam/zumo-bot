@@ -40,14 +40,11 @@
 
 #if 1
 // Hello World!
-void zmain(void)
-{
-    printf("\nHello, World!\n");
+void zmain(void) {
     
-    assignment_6();
+    // call function
 
-    while(true)
-    {
+    while(true) {
         vTaskDelay(100); // sleep (in an infinite loop)
     }
  }   

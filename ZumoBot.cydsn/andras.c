@@ -166,7 +166,6 @@ void assignment_5(void) {
 
     struct sensors_ sensors;
     int count = 0;
-    int touching = 0;
     
     // Start up robot
     printf("\nStarting up.\n");
@@ -186,31 +185,13 @@ void assignment_5(void) {
     
     // Navigate track
     while (count < 2) {
-        reflectance_digital(&sensors);
-        if (sensors.R2 == 1 && sensors.L2 == 0) {
-            while (sensors.R2 == 1) {
-                reflectance_digital(&sensors);
-                tank_turn(-1);
-            }
-        } else if (sensors.L2 == 1 && sensors.R2 == 0) {
-            while (sensors.L2 == 1) {
-                reflectance_digital(&sensors);
-                tank_turn(1);
-            }
-        } else {
-            motor_forward(255, 10);
-            if (touching == 0 && sensors.L3 == 1 && sensors.L2 == 1 && sensors.L1 == 1 && sensors.R1 == 1 && sensors.R2 == 1 && sensors.R1 == 1) {
-                touching = 1;
-                count++;
-                if (count == 1) {
-                    printf("\nWaiting for IR.\n");
-                    motor_forward(0, 0);
-                    IR_wait();
-                    printf("\nIR signal received.\n");
-                }
-            } else if (touching == 1 && (sensors.L3 == 0 || sensors.L2 == 0 || sensors.L1 == 0 || sensors.R1 == 0 || sensors.R2 == 0 || sensors.R1 == 0)) {
-                touching = 0;
-            }
+        follow_line(&sensors, 255, 10);
+        count++;
+        if (count == 1) {
+            printf("\nWaiting for IR.\n");
+            motor_forward(0, 0);
+            IR_wait();
+            printf("\nIR signal received.\n");
         }
     }
     
