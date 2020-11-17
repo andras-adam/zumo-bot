@@ -247,6 +247,13 @@ void assignment_6(void) {
 
 }
 
+// Function for assignment 3/1
+void assignment_7(void) {
+
+    // 
+
+}
+
 // Follow a line until the next intersection
 void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay) {
     reflectance_digital(sensors);
