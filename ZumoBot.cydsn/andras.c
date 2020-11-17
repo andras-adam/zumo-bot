@@ -114,12 +114,12 @@ void assignment_3(void) {
 
 }
 
-// Function for assignment 2/4
+// Function for assignment 2/1
 void assignment_4(void) {
 
+    // Define variables
     struct sensors_ sensors;
     int count = 0;
-    int touching = 0;
     
     // Start up robot
     printf("\nStarting up.\n");
@@ -128,7 +128,7 @@ void assignment_4(void) {
     IR_Start();
     IR_flush();
     reflectance_start();
-    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
     
     // Wait for start button
     printf("\nPress start.\n");
@@ -139,20 +139,14 @@ void assignment_4(void) {
     
     // Navigate track
     while (count < 5) {
-        reflectance_digital(&sensors);
-        if (touching != 1 && sensors.L3 == 1 && sensors.L2 == 1 && sensors.L1 == 1 && sensors.R1 == 1 && sensors.R2 == 1 && sensors.R1 == 1) {
-            touching = 1;
-            count++;
-            if (count == 1) {
-                printf("\nWaiting for IR.\n");
-                motor_forward(0, 0);
-                IR_wait();
-                printf("\nIR signal received.\n");
-            }
-        } else if (touching == 1 && (sensors.L3 == 0 || sensors.L2 == 0 || sensors.L1 == 0 || sensors.R1 == 0 || sensors.R2 == 0 || sensors.R1 == 0)) {
-            touching = 0;
+        follow_line(&sensors, 255, 10);
+        count++;
+        if (count == 1) {
+            printf("\nWaiting for IR.\n");
+            motor_forward(0, 0);
+            IR_wait();
+            printf("\nIR signal received.\n");
         }
-        motor_forward(100, 10); 
     }
     
     // Shut down robot
@@ -164,6 +158,7 @@ void assignment_4(void) {
 // Function for assignment 2/2
 void assignment_5(void) {
 
+    // Define variables
     struct sensors_ sensors;
     int count = 0;
     
@@ -204,6 +199,7 @@ void assignment_5(void) {
 // Function for assignment 2/3
 void assignment_6(void) {
 
+    // Define variables
     struct sensors_ sensors;
     int count = 0;
     
