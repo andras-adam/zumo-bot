@@ -25,15 +25,15 @@
 #include "serial1.h"
 #include <unistd.h>
 
-void assignment_1(void);
-void assignment_2(void);
-void assignment_3(void);
-void assignment_4(void);
-void assignment_5(void);
-void assignment_6(void);
-void assignment_7(void);
-void assignment_8(void);
-void assignment_9(void);
+void assignment_1_1(void);
+void assignment_1_2(void);
+void assignment_1_3(void);
+void assignment_2_1(void);
+void assignment_2_2(void);
+void assignment_2_3(void);
+void assignment_3_1(void);
+void assignment_3_2(void);
+void assignment_3_3(void);
 
 void startup(bool launch_button, bool motor, bool IR, bool reflectance, bool ultrasound);
 void shutdown(void);
