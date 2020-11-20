@@ -1,19 +1,14 @@
-/* ========================================
+/* =========================================
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
+ * Assignment solutions by András Ádám, 2020
  *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
- * ========================================
+ * =========================================
 */
 
 #include <andras.h>
 
-// Function for assignment 1/1
-void assignment_1(void) {
+// Function for assignment 1-1
+void assignment_1_1(void) {
 
     // Start up robot (launch_button, motors)
     startup(true, true, false, false, false);
@@ -35,8 +30,8 @@ void assignment_1(void) {
 
 }
 
-// Function for assignment 1/2
-void assignment_2(void) {
+// Function for assignment 1-2
+void assignment_1_2(void) {
 
     // Start up robot (launch_button, motors, ultrasound)
     startup(true, true, false, false, true);
@@ -57,8 +52,8 @@ void assignment_2(void) {
 
 }
 
-// Function for assignment 1/3
-void assignment_3(void) {
+// Function for assignment 1-3
+void assignment_1_3(void) {
 
     // Start up robot (launch_button, motors, ultrasound)
     startup(true, true, false, false, true);
@@ -81,8 +76,8 @@ void assignment_3(void) {
 
 }
 
-// Function for assignment 2/1
-void assignment_4(void) {
+// Function for assignment 2-1
+void assignment_2_1(void) {
 
     // Define variables
     struct sensors_ sensors;
@@ -103,8 +98,8 @@ void assignment_4(void) {
 
 }
 
-// Function for assignment 2/2
-void assignment_5(void) {
+// Function for assignment 2-2
+void assignment_2_2(void) {
 
     // Define variables
     struct sensors_ sensors;
@@ -125,8 +120,8 @@ void assignment_5(void) {
 
 }
 
-// Function for assignment 2/3
-void assignment_6(void) {
+// Function for assignment 2-3
+void assignment_2_3(void) {
 
     // Define variables
     struct sensors_ sensors;
@@ -159,8 +154,8 @@ void assignment_6(void) {
 
 }
 
-// Function for assignment 3/1
-void assignment_7(void) {
+// Function for assignment 3-1
+void assignment_3_1(void) {
 
     // Define variables
     TickType_t current = 0;
@@ -186,8 +181,8 @@ void assignment_7(void) {
 
 }
 
-// Function for assignment 3/2
-void assignment_8(void) {
+// Function for assignment 3-2
+void assignment_3_2(void) {
 
     // Start up robot (launch_button, motors, ultrasound)
     startup(true, true, false, false, true);
@@ -212,8 +207,8 @@ void assignment_8(void) {
 
 }
 
-// Function for assignment 3/3
-void assignment_9(void) {
+// Function for assignment 3-3
+void assignment_3_3(void) {
 
     // Define variables
     struct sensors_ sensors;
