@@ -175,7 +175,8 @@ void assignment_7(void) {
         while (SW1_Read() == 1) vTaskDelay(1);
         current = xTaskGetTickCount();
         int diff = (int) (current) - (int) (previous);
-        printf("\nMilliseconds since last button push: %d.\n", diff); // TODO - replace with MQTT (topic <robot serial number>/button)
+        printf("\nMilliseconds since last button push: %d.\n", diff);
+        print_mqtt("Zumo01/button", "%d", diff);
         while (SW1_Read() == 0) vTaskDelay(1);
         previous = current;
     }
@@ -199,7 +200,8 @@ void assignment_8(void) {
                 motor_backward(255, 100);
                 int dir = rand() % 2;
                 tank_turn(dir ? 90 : -90);
-                printf("\nTurning 90 degrees %s.\n", dir ? "left" : "right"); // TODO - replace with MQTT (topic <robot serial number>/turn)
+                printf("\nTurning 90 degrees %s.\n", dir ? "left" : "right");
+                print_mqtt("Zumo01/turn", "%s", dir ? "left" : "right");
             } while (Ultra_GetDistance() < 10);
         }
         motor_forward(255, 100);
@@ -227,7 +229,8 @@ void assignment_9(void) {
         if (previous) {
             current = xTaskGetTickCount();
             int diff = (int) (current) - (int) (previous);
-            printf("\nMilliseconds since last line: %d.\n", diff); // TODO - replace with MQTT (topic <robot serial number>/lap)
+            printf("\nMilliseconds since last line: %d.\n", diff);
+            print_mqtt("Zumo01/lap", "%d", diff);
         }
         wait_for_IR();
         previous = xTaskGetTickCount();

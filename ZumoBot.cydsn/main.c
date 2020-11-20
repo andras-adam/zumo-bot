@@ -42,7 +42,7 @@
 // Hello World!
 void zmain(void) {
     
-    // call function
+    // Call function on this line
 
     while(true) {
         vTaskDelay(100); // sleep (in an infinite loop)
