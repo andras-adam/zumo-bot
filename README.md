@@ -1,6 +1,6 @@
 # Zumo Bot (with Metropolia PSoC Adapter)
 
-A project to control a Zumo Bot using the Metropolia-PSoC Adapter. Assignments include line following and obstacle evasion, using reflectance, IR and ultrasonic sensors. The project was meant to be completed as a team assignment for 2-3 persons.
+A project to control a Zumo Bot using the Metropolia PSoC Adapter. Assignments include line following and obstacle evasion, using reflectance, IR and ultrasonic sensors. The project was meant to be completed as a team assignment for 2-3 persons.
 
 #### Team members
 * [András Ádám](https://github.com/NeoAren)
