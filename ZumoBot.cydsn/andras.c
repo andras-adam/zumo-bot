@@ -46,8 +46,8 @@ void assignment_2(void) {
     while (SW1_Read() == 1) {
         int d = Ultra_GetDistance();
         if (d < 10) {
-            motor_backward(255, 10);
-            motor_turn(0, 255, 240);
+            motor_backward(255, 100);
+            motor_turn(0, 200, 350);
         }
         motor_forward(255, 10);
     }
@@ -66,8 +66,7 @@ void assignment_3(void) {
     // Navigate track
     printf("\nPress the button to stop.\n");
     while (SW1_Read() == 1) {
-        int d = Ultra_GetDistance();
-        if (d < 10) {
+        if (Ultra_GetDistance() < 10) {
             motor_backward(255, 100);
             do {
                 int angle = rand() % 180 + 90;
@@ -138,18 +137,18 @@ void assignment_6(void) {
     
     // Navigate track
     while (count < 5) {
-        follow_line(&sensors, 255, 10);
+        follow_line(&sensors, 150, 10);
         count++;
         if (count == 1) {
             wait_for_IR();
         } else if (count == 2) {
             while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
-                motor_turn(0, 200, 10);
+                motor_turn(0, 150, 10);
                 reflectance_digital(&sensors);
             }
         } else if (count == 3 || count == 4) {
             while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
-                motor_turn(200, 0, 10);
+                motor_turn(150, 0, 10);
                 reflectance_digital(&sensors);
             }
         }
@@ -167,16 +166,16 @@ void assignment_7(void) {
     TickType_t current = 0;
     TickType_t previous = 0;
     
-    // Start up robot
-    startup(false, false, false, false, false);
+    // Start up robot (launch_button)
+    startup(true, false, false, false, false);
     
     // Perform task
+    previous = xTaskGetTickCount();
     while (true) {
         while (SW1_Read() == 1) vTaskDelay(1);
-        if (previous == 0) previous = xTaskGetTickCount();
         current = xTaskGetTickCount();
-        int diff = (int) (current) / 1000 - (int) (previous) / 1000;
-        printf("\nSeconds since last button push: %d.\n", diff); // TODO - replace with MQTT
+        int diff = (int) (current) - (int) (previous);
+        printf("\nMilliseconds since last button push: %d.\n", diff); // TODO - replace with MQTT (topic <robot serial number>/button)
         while (SW1_Read() == 0) vTaskDelay(1);
         previous = current;
     }
@@ -195,15 +194,13 @@ void assignment_8(void) {
     // Navigate track
     printf("\nPress the button to stop.\n");
     while (SW1_Read() == 1) {
-        int d = Ultra_GetDistance();
-        if (d < 10) {
+        if (Ultra_GetDistance() < 10) {
             do {
                 motor_backward(255, 100);
                 int dir = rand() % 2;
                 tank_turn(dir ? 90 : -90);
-                printf("\nTurning 90 degrees %s.\n", dir ? "left" : "right"); // TODO - replace with MQTT
-                d = Ultra_GetDistance();
-            } while (d < 10);
+                printf("\nTurning 90 degrees %s.\n", dir ? "left" : "right"); // TODO - replace with MQTT (topic <robot serial number>/turn)
+            } while (Ultra_GetDistance() < 10);
         }
         motor_forward(255, 100);
     }
@@ -230,7 +227,7 @@ void assignment_9(void) {
         if (previous) {
             current = xTaskGetTickCount();
             int diff = (int) (current) - (int) (previous);
-            printf("\nMs since last line: %d.\n", diff); // TODO - replace with MQTT
+            printf("\nMilliseconds since last line: %d.\n", diff); // TODO - replace with MQTT (topic <robot serial number>/lap)
         }
         wait_for_IR();
         previous = xTaskGetTickCount();
@@ -316,25 +313,7 @@ void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay) {
     
 }
 
-// Compare sensor values with AND
-int sensor_AND(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3) {
-    if (sensors->L3 == L3 && sensors->L2 == L2 && sensors->L1 == L1 && sensors->R1 == R1 && sensors->R2 == R2 && sensors->R3 == R3) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-// Compare sensor values with OR
-int sensor_OR(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3) {
-    if (sensors->L3 == L3 || sensors->L2 == L2 || sensors->L1 == L1 || sensors->R1 == R1 || sensors->R2 == R2 || sensors->R3 == R3) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-// Tank turn by x degrees
+// Tank turn by given degrees
 void tank_turn(int16 angle) {
 
     uint8 left_dir = (angle < 0) ? 0 : 1;
@@ -354,6 +333,24 @@ void wait_for_IR(void) {
     IR_flush();
     IR_wait();
     printf("\nIR signal received.\n");
+}
+
+// Compare reflectance sensor values with AND
+int sensor_AND(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3) {
+    if (sensors->L3 == L3 && sensors->L2 == L2 && sensors->L1 == L1 && sensors->R1 == R1 && sensors->R2 == R2 && sensors->R3 == R3) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// Compare reflectance sensor values with OR
+int sensor_OR(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3) {
+    if (sensors->L3 == L3 || sensors->L2 == L2 || sensors->L1 == L1 || sensors->R1 == R1 || sensors->R2 == R2 || sensors->R3 == R3) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 /* [] END OF FILE */
