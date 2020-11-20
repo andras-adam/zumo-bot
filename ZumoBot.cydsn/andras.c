@@ -14,18 +14,9 @@
 
 // Function for assignment 1/1
 void assignment_1(void) {
-    
-    // Start up robot
-    printf("\nStarting up.\n");
-    motor_start();
-    motor_forward(0, 0);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+
+    // Start up robot (launch_button, motors)
+    startup(true, true, false, false, false);
     
     // Navigate track
     motor_forward(255, 1310);
@@ -40,26 +31,15 @@ void assignment_1(void) {
     motor_forward(255, 390);
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
 // Function for assignment 1/2
 void assignment_2(void) {
 
-    // Start up robot
-    printf("\nStarting up.\n");
-    Ultra_Start();
-    motor_start();
-    motor_forward(0, 0);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, ultrasound)
+    startup(true, true, false, false, true);
     
     // Navigate track
     printf("\nPress the button to stop.\n");
@@ -73,26 +53,15 @@ void assignment_2(void) {
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
 // Function for assignment 1/3
 void assignment_3(void) {
 
-    // Start up robot
-    printf("\nStarting up.\n");
-    Ultra_Start();
-    motor_start();
-    motor_forward(0, 0);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, ultrasound)
+    startup(true, true, false, false, true);
     
     // Navigate track
     printf("\nPress the button to stop.\n");
@@ -109,8 +78,7 @@ void assignment_3(void) {
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
@@ -121,37 +89,18 @@ void assignment_4(void) {
     struct sensors_ sensors;
     int count = 0;
     
-    // Start up robot
-    printf("\nStarting up.\n");
-    motor_start();
-    motor_forward(0, 0);
-    IR_Start();
-    IR_flush();
-    reflectance_start();
-    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, IR, reflectance)
+    startup(true, true, true, true, false);
     
     // Navigate track
     while (count < 5) {
         follow_line(&sensors, 255, 10);
         count++;
-        if (count == 1) {
-            printf("\nWaiting for IR.\n");
-            motor_forward(0, 0);
-            IR_wait();
-            printf("\nIR signal received.\n");
-        }
+        if (count == 1) wait_for_IR();
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
@@ -162,37 +111,18 @@ void assignment_5(void) {
     struct sensors_ sensors;
     int count = 0;
     
-    // Start up robot
-    printf("\nStarting up.\n");
-    motor_start();
-    motor_forward(0, 0);
-    IR_Start();
-    IR_flush();
-    reflectance_start();
-    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, IR, reflectance)
+    startup(true, true, true, true, false);
     
     // Navigate track
     while (count < 2) {
         follow_line(&sensors, 255, 10);
         count++;
-        if (count == 1) {
-            printf("\nWaiting for IR.\n");
-            motor_forward(0, 0);
-            IR_wait();
-            printf("\nIR signal received.\n");
-        }
+        if (count == 1) wait_for_IR();
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
@@ -203,31 +133,15 @@ void assignment_6(void) {
     struct sensors_ sensors;
     int count = 0;
     
-    // Start up robot
-    printf("\nStarting up.\n");
-    motor_start();
-    motor_forward(0, 0);
-    IR_Start();
-    IR_flush();
-    reflectance_start();
-    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, IR, reflectance)
+    startup(true, true, true, true, false);
     
     // Navigate track
     while (count < 5) {
         follow_line(&sensors, 255, 10);
         count++;
         if (count == 1) {
-            printf("\nWaiting for IR.\n");
-            motor_forward(0, 0);
-            IR_wait();
-            printf("\nIR signal received.\n");
+            wait_for_IR();
         } else if (count == 2) {
             while (!sensor_AND(&sensors, 0, 0, 1, 1, 0, 0)) {
                 motor_turn(0, 200, 10);
@@ -242,8 +156,7 @@ void assignment_6(void) {
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
@@ -255,7 +168,7 @@ void assignment_7(void) {
     TickType_t previous = 0;
     
     // Start up robot
-    printf("\nStarting up.\n");
+    startup(false, false, false, false, false);
     
     // Perform task
     while (true) {
@@ -269,25 +182,15 @@ void assignment_7(void) {
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
+    shutdown();
 
 }
 
 // Function for assignment 3/2
 void assignment_8(void) {
 
-    // Start up robot
-    printf("\nStarting up.\n");
-    Ultra_Start();
-    motor_start();
-    motor_forward(0, 0);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, ultrasound)
+    startup(true, true, false, false, true);
     
     // Navigate track
     printf("\nPress the button to stop.\n");
@@ -306,8 +209,7 @@ void assignment_8(void) {
     }
     
     // Shut down robot
-    printf("\nShutting down.\n");
-    motor_stop();
+    shutdown();
 
 }
 
@@ -319,21 +221,8 @@ void assignment_9(void) {
     TickType_t previous = 0;
     TickType_t current = 0;
     
-    // Start up robot
-    printf("\nStarting up.\n");
-    motor_start();
-    motor_forward(0, 0);
-    IR_Start();
-    IR_flush();
-    reflectance_start();
-    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
-    
-    // Wait for start button
-    printf("\nPress start.\n");
-    BatteryLed_Write(1);
-    while(SW1_Read() == 1);
-    BatteryLed_Write(0);
-    vTaskDelay(1000);
+    // Start up robot (launch_button, motors, IR, ultrasound)
+    startup(true, true, true, true, false);
     
     // Navigate track
     while (SW1_Read() == 1) {
@@ -343,17 +232,59 @@ void assignment_9(void) {
             int diff = (int) (current) - (int) (previous);
             printf("\nMs since last line: %d.\n", diff); // TODO - replace with MQTT
         }
-        printf("\nWaiting for IR to continue.\n");
-        motor_forward(0, 0); // TODO - move to follow_line()
-        IR_wait();
+        wait_for_IR();
         previous = xTaskGetTickCount();
-        printf("\nIR signal received.\n");
     }
     
     // Shut down robot
+    shutdown();
+
+}
+
+// Start up the robot
+void startup(bool launch_button, bool motor, bool IR, bool reflectance, bool ultrasound) {
+    
+    // Print startup message
+    printf("\nStarting up.\n");
+
+    // Start up motors
+    if (motor) {
+        motor_start();
+        motor_forward(0, 0);
+    }
+    
+    // Start up IR sensors
+    if (IR) {
+        IR_Start();
+        IR_flush();
+    }
+    
+    // Start reflectance
+    if (reflectance) {
+        reflectance_start();
+        reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+    }
+    
+    // Start ultrasound
+    if (ultrasound) {
+        Ultra_Start();
+    }
+    
+    // Wait for button press to start
+    if (launch_button) {
+        printf("\nPress start.\n");
+        BatteryLed_Write(1);
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+    }
+
+}
+
+// Shut down the robot
+void shutdown(void) {
     printf("\nShutting down.\n");
     motor_stop();
-
 }
 
 // Follow a line until the next intersection
@@ -379,6 +310,10 @@ void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay) {
         motor_forward(speed, delay);
         reflectance_digital(sensors);
     }
+    
+    // Stop motors
+    motor_forward(0, 0);
+    
 }
 
 // Compare sensor values with AND
@@ -411,6 +346,14 @@ void tank_turn(int16 angle) {
     
     SetMotors(left_dir, right_dir, 100, 100, delay);
     
+}
+
+// Wait for infrared (IR) signal
+void wait_for_IR(void) {
+    printf("\nWaiting for IR to continue.\n");
+    IR_flush();
+    IR_wait();
+    printf("\nIR signal received.\n");
 }
 
 /* [] END OF FILE */
