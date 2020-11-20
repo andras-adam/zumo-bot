@@ -37,9 +37,11 @@ void assignment_4(void);
 void assignment_5(void);
 void assignment_6(void);
 void assignment_7(void);
+void assignment_8(void);
+void assignment_9(void);
 
-void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay);
 void tank_turn(int16 angle);
+void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay);
 int sensor_AND(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3);
 int sensor_OR(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3);
 

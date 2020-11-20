@@ -250,7 +250,109 @@ void assignment_6(void) {
 // Function for assignment 3/1
 void assignment_7(void) {
 
-    // 
+    // Define variables
+    TickType_t current = 0;
+    TickType_t previous = 0;
+    
+    // Start up robot
+    printf("\nStarting up.\n");
+    
+    // Perform task
+    while (true) {
+        while (SW1_Read() == 1) vTaskDelay(1);
+        if (previous == 0) previous = xTaskGetTickCount();
+        current = xTaskGetTickCount();
+        int diff = (int) (current) / 1000 - (int) (previous) / 1000;
+        printf("\nSeconds since last button push: %d.\n", diff); // TODO - replace with MQTT
+        while (SW1_Read() == 0) vTaskDelay(1);
+        previous = current;
+    }
+    
+    // Shut down robot
+    printf("\nShutting down.\n");
+
+}
+
+// Function for assignment 3/2
+void assignment_8(void) {
+
+    // Start up robot
+    printf("\nStarting up.\n");
+    Ultra_Start();
+    motor_start();
+    motor_forward(0, 0);
+    
+    // Wait for start button
+    printf("\nPress start.\n");
+    BatteryLed_Write(1);
+    while(SW1_Read() == 1);
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    // Navigate track
+    printf("\nPress the button to stop.\n");
+    while (SW1_Read() == 1) {
+        int d = Ultra_GetDistance();
+        if (d < 10) {
+            do {
+                motor_backward(255, 100);
+                int dir = rand() % 2;
+                tank_turn(dir ? 90 : -90);
+                printf("\nTurning 90 degrees %s.\n", dir ? "left" : "right"); // TODO - replace with MQTT
+                d = Ultra_GetDistance();
+            } while (d < 10);
+        }
+        motor_forward(255, 100);
+    }
+    
+    // Shut down robot
+    printf("\nShutting down.\n");
+    motor_stop();
+
+}
+
+// Function for assignment 3/3
+void assignment_9(void) {
+
+    // Define variables
+    struct sensors_ sensors;
+    TickType_t previous = 0;
+    TickType_t current = 0;
+    
+    // Start up robot
+    printf("\nStarting up.\n");
+    motor_start();
+    motor_forward(0, 0);
+    IR_Start();
+    IR_flush();
+    reflectance_start();
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+    
+    // Wait for start button
+    printf("\nPress start.\n");
+    BatteryLed_Write(1);
+    while(SW1_Read() == 1);
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    // Navigate track
+    while (SW1_Read() == 1) {
+        follow_line(&sensors, 255, 10);
+        if (previous) {
+            current = xTaskGetTickCount();
+            int diff = (int) (current) - (int) (previous);
+            printf("\nMs since last line: %d.\n", diff); // TODO - replace with MQTT
+        }
+        printf("\nWaiting for IR to continue.\n");
+        motor_forward(0, 0); // TODO - move to follow_line()
+        IR_wait();
+        previous = xTaskGetTickCount();
+        printf("\nIR signal received.\n");
+    }
+    
+    // Shut down robot
+    printf("\nShutting down.\n");
+    motor_stop();
 
 }
 
