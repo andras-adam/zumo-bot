@@ -1,6 +1,6 @@
 # Zumo Bot (with Metropolia PSoC Adapter)
 
-A project to control a Zumo Bot using the Metropolia-PSoC Adapter. Assignments include line following and obstacle evasion, using reflectance, IR and ultrasonic sensors. The project was meant to be completed as a team assignment for 2-3 persons.
+A project to control a Zumo Bot using the Metropolia PSoC Adapter. Assignments include line following and obstacle evasion, using reflectance, IR and ultrasonic sensors. The project was meant to be completed as a team assignment for 2-3 persons.
 
 #### Team members
 * [András Ádám](https://github.com/NeoAren)
@@ -43,6 +43,3 @@ Write a program that uses ultrasonic sensor to detect obstacles. When an obstacl
 
 ### Assignment 3-3
 Write a program that runs the robot to a line. When the line is reached the robot waits for an IR-remote command. After receiving the IR-command the robot runs forward until it sees another line. The robot stops on the line and sends the elapsed time (from IR-command to the stop line) to topic `<robot serial number>/lap`.
-
----
-András Ádám, Vasily Davydov - 2020
