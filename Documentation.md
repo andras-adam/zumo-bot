@@ -1,4 +1,4 @@
-# Documentation (Metropolia PSoC Adapter)
+# Documentation and example code
 
 Code examples demonstrating the usage of the sensors available in the Metropolia PSoC Adapter.
 
@@ -25,7 +25,7 @@ void zmain(void) {
    
    printf("\nHello, world!\n");
    
-   while(true) {
+   while (true) {
       vTaskDelay(100); // sleep (in an infinite loop)
    }
 }
@@ -48,7 +48,7 @@ void zmain(void) {
    printf("You are [%s], age = %d\n", name, age);
    
    while (true) {  
-      BatteryLed_Write(!SW1_Read());  
+      BatteryLed_Write(!SW1_Read()); // Switch led off (0) or on (1)
       vTaskDelay(100);  
    }  
 }
@@ -208,7 +208,7 @@ void zmain(void) {
       
       // Read and print digital values that are based on threshold. 0 = white, 1 = black
       reflectance_digital(&dig);
-      printf("%5d %5d %5d %5d %5d %5d \r\n", dig.L3, dig.L2, dig.L1, dig.R1, dig.R2, dig.R3);        
+      printf("%5d %5d %5d %5d %5d %5d\r\n", dig.L3, dig.L2, dig.L1, dig.R1, dig.R2, dig.R3);        
       
       vTaskDelay(200);
    }
@@ -233,9 +233,7 @@ void zmain(void) {
 
    motor_stop();               // Disable motor controller
    
-   while (true) {
-      vTaskDelay(100);
-   }
+   while (true) vTaskDelay(100);
 }
 ```
 ---
@@ -243,10 +241,10 @@ void zmain(void) {
 ### Accelerometer
 ```c
 void zmain(void) {
+
    struct accData_ data;
    
    printf("Accelerometer test...\n");
-
    if (!LSM303D_Start()){
       printf("LSM303D failed to initialize! Program is ending!\n");
       vTaskSuspend(NULL);
@@ -266,6 +264,7 @@ void zmain(void) {
 ### MQTT
 ```c
 void zmain(void) {
+
    int ctr = 0;
 
    printf("\nBoot\n");
@@ -290,8 +289,6 @@ void zmain(void) {
    struct sensors_ ref;
    struct sensors_ dig;
    
-   printf("MQTT and sensor test...\n");
-
    if (!LSM303D_Start()) {
       printf("LSM303D failed to initialize! Program is ending!\n");
       vTaskSuspend(NULL);
@@ -324,8 +321,8 @@ void zmain(void) {
 ### Real time clock
 ```c
 void zmain(void) {
+
    RTC_Start();
-   
    RTC_TIME_DATE now;
 
    // Set current time
