@@ -241,6 +241,8 @@ void assignment_line_following(void) {
     // Define variables
     struct sensors_ sensors;
     int count = 0;
+    TickType_t start = 0;
+    TickType_t stop = 0;
     
     // Start up robot (launch_button, motors, IR, reflectance)
     startup(true, true, true, true, false);
@@ -249,7 +251,17 @@ void assignment_line_following(void) {
     while (count < 3) {
         follow_line(&sensors, 255, 10);
         count++;
-        if (count == 1) wait_for_IR();
+        if (count == 1) {
+            send_mqtt("Zumo17/ready", "line");
+            wait_for_IR();
+            start = xTaskGetTickCount();
+            print_mqtt("Zumo17/start", "%d", start);
+        } else if (count == 3) {
+            stop = xTaskGetTickCount();
+            print_mqtt("Zumo17/stop", "%d", stop);
+            int time = (int) stop - (int) start;
+            print_mqtt("Zumo17/time", "%d", time);
+        }
     }
     
     // Shut down robot
