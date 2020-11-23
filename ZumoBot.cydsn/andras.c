@@ -215,7 +215,7 @@ void assignment_3_3(void) {
     TickType_t previous = 0;
     TickType_t current = 0;
     
-    // Start up robot (launch_button, motors, IR, ultrasound)
+    // Start up robot (launch_button, motors, IR, reflectance)
     startup(true, true, true, true, false);
     
     // Navigate track
@@ -229,6 +229,27 @@ void assignment_3_3(void) {
         }
         wait_for_IR();
         previous = xTaskGetTickCount();
+    }
+    
+    // Shut down robot
+    shutdown();
+
+}
+
+void assignment_line_following(void) {
+
+    // Define variables
+    struct sensors_ sensors;
+    int count = 0;
+    
+    // Start up robot (launch_button, motors, IR, reflectance)
+    startup(true, true, true, true, false);
+    
+    // Navigate track
+    while (count < 3) {
+        follow_line(&sensors, 255, 10);
+        count++;
+        if (count == 1) wait_for_IR();
     }
     
     // Shut down robot
