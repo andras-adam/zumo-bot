@@ -11,12 +11,6 @@
 */
 #include <vasilydavydov.h>
 
-void vPrinter(){
-printf("Hello VAsily!");
-while(true){
-vTaskDelay(100);
-}
 
 
-}
 /* [] END OF FILE */
