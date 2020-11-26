@@ -19,4 +19,8 @@ Export/
 *.svd
 *.log
 
+# IDE files
+.idea/
+.vscode/
+
 # End of https://www.gitignore.io/api/psoccreator
