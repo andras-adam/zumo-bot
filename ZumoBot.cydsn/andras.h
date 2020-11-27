@@ -35,6 +35,7 @@ void assignment_3_1(void);
 void assignment_3_2(void);
 void assignment_3_3(void);
 
+void assignment_sumo_wrestling(void);
 void assignment_line_following(void);
 
 void startup(bool launch_button, bool motor, bool IR, bool reflectance, bool ultrasound);
