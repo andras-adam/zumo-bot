@@ -12,7 +12,7 @@
 #include <vasilydavydov.h>
 
 // Function for assignment 1-1
-void assignment_week3_1(void) {
+/*void assignment_week3_1(void) {
 
 
 motor_start();
@@ -34,7 +34,7 @@ motor_forward(0, 0);
     shut();
 
 }
-
+*/
 
 /*void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
     BatteryLed_Write(0);
@@ -61,5 +61,34 @@ void shut (void){
     motor_stop();
 }
     
+
+
+// function for recongnising obstacles
+void obstacle (){
+    motor_forward(0,10);
+    motor_backward(100, 150);
+    motor_turn(0, 150, 462);
+}
+
+
+
+void assignment_week3_2 (void){
+    
+    //starting motors and Ultrasonic sensor
+    motor_start();
+    Ultra_Start();
+    //starting from a zero speed
+    motor_forward(0, 0);
+    //entering an infinite loop
+    while (true) {
+        motor_forward(120, 50); //giving speed to motors
+        // vTaskDelay(100);
+        if (Ultra_GetDistance() < 11){ //assigning the value of the function (10cm) to an if-statement
+            obstacle(); 
+        }
+    }    
+}
+
+
 
 /* [] END OF FILE */

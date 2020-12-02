@@ -33,4 +33,6 @@
 void shut(void);
 int start (bool motor, bool IR, bool reflectance, bool ultrasonic, bool led);
 void assignment_week3_1(void);
+void assignment_week3_2 (void);
+void obstacle();
 /* [] END OF FILE */
