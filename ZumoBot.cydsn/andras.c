@@ -236,6 +236,78 @@ void assignment_3_3(void) {
 
 }
 
+// Function for assignment sumo-wrestling
+void assignment_sumo_wrestling(void) {
+
+    // Define variables
+    struct sensors_ sensors;
+    TickType_t start = 0;
+    TickType_t stop = 0;
+    
+    // Start up robot (launch_button, motors, IR, reflectance, ultrasound)
+    startup(true, true, true, true, true);
+    
+    // Naviage to ring
+    start = xTaskGetTickCount();
+    follow_line(&sensors, 255, 10);
+    send_mqtt("Zumo17/ready", "zumo");
+    wait_for_IR();
+    print_mqtt("Zumo17/start", "%d", start);
+    
+    // Enter the ring
+    while (sensor_OR(&sensors, 1, 1, 1, 1, 1, 1)) {
+        motor_forward(255, 10);
+        reflectance_digital(&sensors);
+    }
+    motor_forward(0, 0);
+    
+    // Navigate track
+    while (SW1_Read() == 1) {
+        
+        // Set turn direction when hitting the edge
+        int dir = 0;
+        if (sensors.L3 == 1 && sensors.R3 == 1) {
+            dir = rand() % 2 + 1;
+        } else if (sensors.L3 == 1 && sensors.R3 == 0) {
+            dir = 1;
+        } else if (sensors.L3 == 0 && sensors.R3 == 1) {
+            dir = 2;
+        }
+        
+        // Turn back to the ring from the edge
+        if (dir) {
+            while (!sensor_AND(&sensors, 0, 0, 0, 0, 0, 0)) {
+                motor_turn(dir == 1 ? 255 : 0, dir == 1 ? 0 : 255, 10);
+                reflectance_digital(&sensors);
+            }
+            int delay = rand() % 300 + 100;
+            motor_turn(dir == 1 ? 200 : 0, dir == 1 ? 0 : 200, delay);
+        }
+        
+        // Obstacle evasion
+        if (Ultra_GetDistance() < 10) {
+            dir = rand() % 2 + 1;
+            print_mqtt("Zumo17/obstacle", "%d", xTaskGetTickCount());
+            while (Ultra_GetDistance() < 15) {
+                motor_turn(dir == 1 ? 200 : 0, dir == 1 ? 0 : 200, 50);
+            }
+        }
+        
+        // Move robot
+        motor_forward(255, 10);
+        reflectance_digital(&sensors);
+        
+    }
+    
+    // Shut down robot
+    stop = xTaskGetTickCount();
+    print_mqtt("Zumo17/stop", "%d", stop);
+    print_mqtt("Zumo17/time", "%d", stop - start);
+    shutdown();
+
+}
+
+// Function for assignment line-follower
 void assignment_line_following(void) {
 
     // Define variables
