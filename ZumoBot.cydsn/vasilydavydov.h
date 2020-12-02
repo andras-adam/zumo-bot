@@ -27,4 +27,10 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+
+
+//function declarations:
+void shut(void);
+int start (bool motor, bool IR, bool reflectance, bool ultrasonic, bool led);
+void assignment_week3_1(void);
 /* [] END OF FILE */
