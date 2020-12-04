@@ -19,7 +19,7 @@ motor_start();
 motor_forward(0, 0);
     
     // Track navigation
-    motor_forward(255, 1310);
+    motor_forward(255, 4000);
     motor_turn(200, 0, 262);
     motor_forward(255, 1020);
     motor_turn(200, 0, 262);
@@ -35,8 +35,7 @@ motor_forward(0, 0);
 
 }
 */
-
-/*void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
+void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
     BatteryLed_Write(0);
     while (true) {
       if (SW1_Read() == 0) {
@@ -55,8 +54,8 @@ motor_forward(0, 0);
 motor_start();              
 motor_forward(0, 0);
  }
-*/
-void shut (void){
+
+void shut(void){
     motor_forward(0,0);
     motor_stop();
 }
@@ -89,6 +88,44 @@ void assignment_week3_2 (void){
     }    
 }
 
+
+//These functions allow to make a tankturn either left or right:
+//200 speed 262 delay is 90 degrees
+void tank_turn_right(uint8 speed,uint32 delay){
+//   SetMotors(0,0, l_speed, r_speed, delay);
+    SetMotors(0,1, speed, speed, delay);
+}
+void tank_turn_left(uint8 speed,uint32 delay){
+//   SetMotors(0,0, l_speed, r_speed, delay);
+    SetMotors(1,0, speed, speed, delay);
+
+}
+
+
+void assignment_week3_3 (){
+ //starting motors and Ultrasonic sensor
+    motor_start();
+    Ultra_Start();
+    //starting from a zero speed
+    motor_forward(0, 0);
+    //entering an infinite loop
+    while (true) {
+        motor_forward(120, 50); //giving speed to motors
+        // vTaskDelay(100);
+        if (Ultra_GetDistance() < 11){ //assigning the value of the function (10cm) to an if-statement
+            motor_backward(100,150);
+            int angle = rand()%600+200;
+            if (rand()%2 == 1){
+                tank_turn_right(angle, 262);
+            }else {
+                tank_turn_left(angle, 262);
+            }    
+        }
+    }    
+
+
+
+}
 
 
 /* [] END OF FILE */

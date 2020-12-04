@@ -27,6 +27,7 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+#include <stdlib.h>
 
 
 //function declarations:
@@ -35,4 +36,6 @@ int start (bool motor, bool IR, bool reflectance, bool ultrasonic, bool led);
 void assignment_week3_1(void);
 void assignment_week3_2 (void);
 void obstacle();
+void tank_turn_right(uint8 speed,uint32 delay);
+void tank_turn_left(uint8 speed,uint32 delay);
 /* [] END OF FILE */
