@@ -35,7 +35,7 @@ motor_forward(0, 0);
 
 }
 */
-void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
+/*void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
     BatteryLed_Write(0);
     while (true) {
       if (SW1_Read() == 0) {
@@ -54,7 +54,7 @@ void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
 motor_start();              
 motor_forward(0, 0);
  }
-
+*/
 void shut(void){
     motor_forward(0,0);
     motor_stop();
@@ -109,22 +109,23 @@ void assignment_week3_3 (){
     //starting from a zero speed
     motor_forward(0, 0);
     //entering an infinite loop
-    while (true) {
-        motor_forward(120, 50); //giving speed to motors
+    while (SW1_Read()==1) {
+       
         // vTaskDelay(100);
         if (Ultra_GetDistance() < 11){ //assigning the value of the function (10cm) to an if-statement
             motor_backward(100,150);
-            int angle = rand()%600+200;
+            int angle = rand()%524+262;
             if (rand()%2 == 1){
-                tank_turn_right(angle, 262);
+                tank_turn_right(200, angle);
             }else {
-                tank_turn_left(angle, 262);
+                tank_turn_left(200, angle);
             }    
         }
+        motor_forward(200, 50); //giving speed to motors
     }    
 
-
-
+motor_forward(0,0);//stoppimg the motor
+motor_stop();
 }
 
 
