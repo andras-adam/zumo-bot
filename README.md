@@ -5,7 +5,7 @@ A project to control a Zumo Bot using the Metropolia PSoC Adapter. Assignments i
 
 #### Team members
 * [András Ádám](https://github.com/NeoAren) ([andras.h](/ZumoBot.cydsn/andras.h), [andras.c](/ZumoBot.cydsn/andras.c))
-* [Vasily Davydov](https://github.com/vas-dav)
+* [Vasily Davydov](https://github.com/vas-dav) ([vasilydavydov.h](/ZumoBot.cydsn/vasilydavydov.h), [vasilydavydov.c](/ZumoBot.cydsn/vasilydavydov.c))
 
 #### Metropolia PSoC Adapter
 - Example code available [here](/Documentation.md)
