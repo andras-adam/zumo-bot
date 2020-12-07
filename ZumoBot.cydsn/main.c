@@ -42,6 +42,8 @@
 void zmain(void) {
     
     // Call function here
+    assignment_week3_3();
+    printf("Everything works\n");
 
     // Sleep (in an infinite loop)
     while(true) vTaskDelay(100);

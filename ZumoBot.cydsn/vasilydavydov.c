@@ -35,26 +35,38 @@ motor_forward(0, 0);
 
 }
 */
-/*void start(bool motor, bool IR, bool reflectance, bool ultrasonic, bool led){
-    BatteryLed_Write(0);
-    while (true) {
-      if (SW1_Read() == 0) {
-         led = !led;
-         BatteryLed_Write(led);
-         if (led) {
-            printf("Led is ON\n");
-         } else {
-            printf("Led is OFF\n");
-         }
-         Beep(1000, 150);
-         while(SW1_Read() == 0) vTaskDelay(10); // Wait while button is being pressed
-      }        
-   }
+void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
+{
+            printf("\nPreparing for a stratup\n");
+    
+            //motor starts  
+            if (motor)
+            {
+            motor_start();              
+            motor_forward(0, 0);
+ 
+            }
+            //IR starts
+            if (IR)
+            {
+            IR_Start();
+            IR_flush();
+            }
+            //reflectance startup
+            if (reflectance)
+            {
+                reflectance_start();
+                reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+            }
+            //ultrasonic starts
+            if (ultrasonic)
+            {
+                Ultra_Start();
+            }
+           printf("\nStartup Done Successfully!\n");
+                
+}            
 
-motor_start();              
-motor_forward(0, 0);
- }
-*/
 void shut(void){
     motor_forward(0,0);
     motor_stop();
@@ -102,12 +114,9 @@ void tank_turn_left(uint8 speed,uint32 delay){
 }
 
 
-void assignment_week3_3 (){
- //starting motors and Ultrasonic sensor
-    motor_start();
-    Ultra_Start();
-    //starting from a zero speed
-    motor_forward(0, 0);
+void assignment_week3_3 ()
+{
+launch_system(true, true, true, true);
     //entering an infinite loop
     while (SW1_Read()==1) {
        
@@ -129,4 +138,28 @@ motor_stop();
 }
 
 
+void assignment_week4_1()
+{
+    launch_system(true, true, true, true);
+    int lines = 0;
+    
+    
+    
+
+}
+
+
+
+
+void line_follower();
+int getRefValues (struct sensors_ *sensors, int SL3, int SL2, int SL1, int SR1, int SR2, int SR3)
+{
+ if (sensors->L1 == SL1 && sensors->L2 == SL2 && sensors->L3 == SL3 && sensors->R1 == SR1 && sensors->R2 == SR2 &&sensors->R3 == SR3 )
+{
+    return 1;
+}else
+{
+    return 0;
+}
+}
 /* [] END OF FILE */

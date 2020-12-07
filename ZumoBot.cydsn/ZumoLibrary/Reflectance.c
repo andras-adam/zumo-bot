@@ -13,7 +13,7 @@
 
 #include "zumo_config.h"
 
-#if ZUMO_SIMULATOR == 0
+#if ZUMO_SIMULATOR == 1
 
 static volatile struct sensors_ sensors;
 static struct sensors_ threshold = { 10000, 10000, 10000, 10000, 10000, 10000};
