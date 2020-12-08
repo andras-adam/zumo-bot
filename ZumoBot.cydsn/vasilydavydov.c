@@ -248,6 +248,38 @@ void assignment_week4_3()
            
 }
 
+void assignment_week5_1()
+{
+    TickType_t press1= xTaskGetTickCount();
+    
+        //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+        
+        while(1)
+        {
+            //button is not pressed
+            while(SW1_Read() == 1)vTaskDelay(10);
+            BatteryLed_Write(0);
+                TickType_t press2= xTaskGetTickCount();
+                //getting the difference
+                int difference = (int)(press2) - (int)(press1);
+                //Assigning first press value to the next one, so the start point is always new
+                press1 = press2;  
+                printf("\nMilliseconds from the previous button press: %d\n", difference);
+                print_mqtt("Zumo99/button",  "%d", difference);
+                //button is pressed
+                while(SW1_Read() == 0)vTaskDelay(10);  
+                BatteryLed_Write(1);
+                
+        }
+              
+                
+    
+}
 
 
 
@@ -296,6 +328,8 @@ void line_follower(struct sensors_ *sensors)
 //Stopping the motors
     motor_forward(0,0);
 }
+
+
 
 
 

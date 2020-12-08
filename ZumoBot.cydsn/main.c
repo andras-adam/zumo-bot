@@ -42,7 +42,7 @@
 void zmain(void) {
 
     // Call function here
- assignment_week4_3();
+ assignment_week5_1();
     printf("Everything works\n");
 
     // Sleep (in an infinite loop)
