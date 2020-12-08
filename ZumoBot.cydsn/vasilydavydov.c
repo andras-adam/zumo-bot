@@ -146,26 +146,18 @@ motor_stop();
 
 
 void assignment_week4_1()
-{
+{ 
+    //variables declaration
     int lines = 0;
     struct sensors_ sensors;
     launch_system(true, true, true, true);
-   /* while(1)
-    {
-      
-        printf("%d\n", getRefValues(&sensors, 0,0,1,1,0,0));
-        motor_forward(10,500);
-        motor_forward(0,0);
-        IR_wait();
-        reflectance_digital(&sensors);
-    }
-*/
-  
+//Enter to loops of intersections
      while(lines <5)
     {
         line_follower(&sensors);
         lines++;
             printf("We on line %d\n", lines);
+            //Witing for the IR-signal
         if(lines == 1)
         {
         
@@ -181,53 +173,48 @@ void assignment_week4_1()
 
 
 
-
+//Function that allows to follow the line
 void line_follower(struct sensors_ *sensors)
-{ /*
-
-        launch_system(true, true, true, true);
-        motor_forward(1,100);
-    while(1)
-    {   
-        printf("\nL1: %d\n", sensors->L1);
-        printf("\nR3: %d\n", sensors->R2);
-        vTaskDelay(100);
-    }*/
+{ 
      reflectance_digital(sensors);
-   
+   //Going through the intersection
     while(getRefValues(sensors, 1, 1,1,1,1,1))
     {
         motor_forward(200,10);
         reflectance_digital(sensors);
     }
- printf("%d %d %d %d %d %d", sensors->L3,sensors->L2,sensors->L1,sensors->R1,sensors->R2, sensors->R3 );
+
 
     while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
     {
+        //Left Turn
         while(sensors->R2 == 0 && sensors->L2 == 1)
         {
-            tank_turn_left(200,1);
+            tank_turn_left(255,1);
             reflectance_digital(sensors);
         }
+        //Right Turn
         while(sensors->R2 == 1 && sensors->L2 == 0)
         {
-            tank_turn_right(200, 1);
+            tank_turn_right(255, 1);
             reflectance_digital(sensors);
         }
-        while(sensors->R2 == 0 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
+        //Left turn over 90 degrees
+        while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
         {
-            tank_turn_left(120, 262);
+            tank_turn_left(255, 1);
             reflectance_digital(sensors);
         }
-         while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 0 && sensors->L3 == 0)
+        //Right turn over 90 degrees
+         while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
         {
-            tank_turn_right(120, 262);
+            tank_turn_right(255, 1);
             reflectance_digital(sensors);
         }
         motor_forward(200, 10);
         reflectance_digital(sensors);
     }
-
+//Stopping the motors
     motor_forward(0,0);
 }
 
