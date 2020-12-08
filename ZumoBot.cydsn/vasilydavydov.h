@@ -42,5 +42,6 @@ void tank_turn_left(uint8 speed,uint32 delay);
 void assignment_week3_1(void);
 void assignment_week3_2 (void);
 void assignment_week3_3 (void);
+void assignment_week4_2 (void);
 
 /* [] END OF FILE */
