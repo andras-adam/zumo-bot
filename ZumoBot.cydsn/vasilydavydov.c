@@ -206,24 +206,46 @@ void assignment_week4_3()
         while(SW1_Read() == 1);
         BatteryLed_Write(0);
         vTaskDelay(1000);
+        //stop on the last intersection
+        while(lines < 5)
         {
-            while(lines <2)
-            {
                 line_follower(&sensors);
                 lines++;
-                //Checking on which line we are
-                printf("We on line %d\n", lines);
-                     //Witing for the IR-signal
-                 if(lines == 1)
+                //Wait for the signal on the first intersection
+                if(lines == 1)
                 {
-        
                     IR_flush();
                     IR_wait();
-                }
+                    //turn left on the second intersection
+                } else if(lines == 2)
+                  {
+                    while(!getRefValues(&sensors, 0,0,1,1,0,0))
+                    {
+                     
+                     motor_turn(10,200,10);
+                     reflectance_digital(&sensors);
+                    }
+                    //turn right on the third intersection
+                  }else if(lines == 3)
+                   {
+                    while(!getRefValues(&sensors, 0,0,1,1,0,0))
+                    {  
+                     motor_turn(200,10,10);
+                     reflectance_digital(&sensors);
+                    }//turn right on the fourth intersection
+                   }else if(lines == 4)
+                    {
+                    while(!getRefValues(&sensors, 0,0,1,1,0,0))
+                    {
+                     motor_turn(200,10,10);
+                     reflectance_digital(&sensors);
+                    }
+                    }
+        }
             
-            }
+            //shuttin the system
             shut();
-        }   
+           
 }
 
 
@@ -236,7 +258,7 @@ void line_follower(struct sensors_ *sensors)
    //Going through the intersection
     while(getRefValues(sensors, 1, 1,1,1,1,1))
     {
-        motor_forward(200,10);
+        motor_forward(100,10);
         reflectance_digital(sensors);
     }
 
@@ -255,6 +277,7 @@ void line_follower(struct sensors_ *sensors)
             tank_turn_right(255, 1);
             reflectance_digital(sensors);
         }
+        
         //Left turn over 90 degrees
         while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
         {
