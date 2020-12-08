@@ -139,12 +139,6 @@ motor_stop();
 
 
 
- 
-
-
-
-
-
 void assignment_week4_1()
 { 
     //variables declaration and engine launch
@@ -180,6 +174,38 @@ void assignment_week4_2()
         while(SW1_Read() == 1);
         BatteryLed_Write(0);
         vTaskDelay(1000);
+        
+            while(lines <2)
+            {
+                line_follower(&sensors);
+                lines++;
+                //Checking on which line we are
+                printf("We on line %d\n", lines);
+                     //Witing for the IR-signal
+                 if(lines == 1)
+                {
+        
+                    IR_flush();
+                    IR_wait();
+                }
+            
+            }
+            shut();
+         
+}
+        
+void assignment_week4_3()
+{
+     //variables declaration and engine launch
+    int lines = 0;
+    struct sensors_ sensors;
+    launch_system(true, true, true, true);
+    //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
         {
             while(lines <2)
             {
@@ -199,8 +225,6 @@ void assignment_week4_2()
             shut();
         }   
 }
-        
-
 
 
 
