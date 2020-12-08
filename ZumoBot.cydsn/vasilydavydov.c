@@ -281,7 +281,39 @@ void assignment_week5_1()
     
 }
 
+void assignment_week5_2()
+{
+    
+    launch_system(true, true, false, true);
 
+
+            while(1)
+            {
+                if(Ultra_GetDistance() < 11){
+                    motor_forward(0,0);
+                    vTaskDelay(500);
+                    motor_backward(100,300);
+                    if(rand()%2 == 1)
+                    {
+
+                        tank_turn_right(100,262);
+                        print_mqtt("Zumo99/turn: ", "%s", "right");
+                    }
+                        else
+                    {
+                        tank_turn_left(100,262);
+                        print_mqtt("Zumo99/turn", "%s", "left");
+                    }
+                    
+                }
+                            motor_forward(200,10);
+            }
+
+
+          
+            
+    
+}
 
 //Function that allows to follow the line
 void line_follower(struct sensors_ *sensors)
