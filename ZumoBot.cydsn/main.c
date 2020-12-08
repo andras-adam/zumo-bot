@@ -40,9 +40,9 @@
 
 
 void zmain(void) {
-    
+
     // Call function here
-    assignment_week3_3();
+assignment_week4_1();
     printf("Everything works\n");
 
     // Sleep (in an infinite loop)
