@@ -341,6 +341,60 @@ void assignment_line_following(void) {
 
 }
 
+// Function for assignment maze
+void assignment_maze(void) {
+    
+    // Define variables
+    struct sensors_ sensors;
+    int intersect_distance = 15;
+    struct position {
+        int x;
+        int y;
+        char dir;
+    } pos;
+    int grid[12][7] = {{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};
+    
+    // Start up robot (launch_button, motors, IR, reflectance, ultrasound)
+    startup(true, true, true, true, true);
+    
+    // Navigate to start line
+    follow_line(&sensors, 255, 10);
+    wait_for_IR();
+    follow_line(&sensors, 255, 10);
+    
+    // Navigate maze
+    while (pos.x != 12) {
+        
+        // check distance
+        int d = Ultra_GetDistance() / intersect_distance + 1;
+        if (pos.dir == 'N') {
+            grid[pos.x + d][pos.y] = 1;
+        } else if (pos.dir == 'E') {
+            grid[pos.x][pos.y + d] = 1;
+        } else if (pos.dir == 'S') {
+            grid[pos.x - d][pos.y] = 1;
+        } else if (pos.dir == 'W') {
+            grid[pos.x][pos.y - d] = 1;
+        }
+        
+        //  if distance == 1, must turn
+        //      if N or W, turn -90, else turn 90
+        
+        
+    }
+    
+    while (true) {
+        int d = Ultra_GetDistance();
+        printf("\nDistance is %d.\n", d);
+        follow_line(&sensors, 255, 10);
+        wait_for_IR();
+    }
+    
+    // Shut down robot
+    shutdown();
+    
+}
+
 // Start up the robot
 void startup(bool launch_button, bool motor, bool IR, bool reflectance, bool ultrasound) {
     
