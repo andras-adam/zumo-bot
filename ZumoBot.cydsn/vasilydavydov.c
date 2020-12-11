@@ -138,28 +138,248 @@ motor_stop();
 }
 
 
-void assignment_week4_1()
-{
-    launch_system(true, true, true, true);
-    int lines = 0;
-    
-    
-    
 
+void assignment_week4_1()
+{ 
+    //variables declaration and engine launch
+    int lines = 0;
+    struct sensors_ sensors;
+    launch_system(true, true, true, true);
+//Enter to loops of intersections
+     while(lines <5)
+    {
+        line_follower(&sensors);
+        lines++;
+            printf("We on line %d\n", lines);
+            //Witing for the IR-signal
+        if(lines == 1)
+        {
+        
+            IR_flush();
+            IR_wait();
+        }
+            
+    }  
+}   
+
+void assignment_week4_2()
+{
+     //variables declaration and engine launch
+    int lines = 0;
+    struct sensors_ sensors;
+    launch_system(true, true, true, true);
+    //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+        
+            while(lines <2)
+            {
+                line_follower(&sensors);
+                lines++;
+                //Checking on which line we are
+                printf("We on line %d\n", lines);
+                     //Witing for the IR-signal
+                 if(lines == 1)
+                {
+        
+                    IR_flush();
+                    IR_wait();
+                }
+            
+            }
+            shut();
+         
+}
+        
+void assignment_week4_3()
+{
+     //variables declaration and engine launch
+    int lines = 0;
+    struct sensors_ sensors;
+    launch_system(true, true, true, true);
+    //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+        //stop on the last intersection
+        while(lines < 5)
+        {
+                line_follower(&sensors);
+                lines++;
+                //Wait for the signal on the first intersection
+                if(lines == 1)
+                {
+                    IR_flush();
+                    IR_wait();
+                    //turn left on the second intersection
+                } else if(lines == 2)
+                  {
+                    while(!getRefValues(&sensors, 0,0,1,1,0,0))
+                    {
+                     
+                     motor_turn(10,200,10);
+                     reflectance_digital(&sensors);
+                    }
+                    //turn right on the third intersection
+                  }else if(lines == 3)
+                   {
+                    while(!getRefValues(&sensors, 0,0,1,1,0,0))
+                    {  
+                     motor_turn(200,10,10);
+                     reflectance_digital(&sensors);
+                    }//turn right on the fourth intersection
+                   }else if(lines == 4)
+                    {
+                    while(!getRefValues(&sensors, 0,0,1,1,0,0))
+                    {
+                     motor_turn(200,10,10);
+                     reflectance_digital(&sensors);
+                    }
+                    }
+        }
+            
+            //shuttin the system
+            shut();
+           
+}
+
+void assignment_week5_1()
+{
+    TickType_t press1= xTaskGetTickCount();
+    
+        //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+        
+        while(1)
+        {
+            //button is not pressed
+            while(SW1_Read() == 1)vTaskDelay(10);
+            BatteryLed_Write(0);
+                TickType_t press2= xTaskGetTickCount();
+                //getting the difference
+                int difference = (int)(press2) - (int)(press1);
+                //Assigning first press value to the next one, so the start point is always new
+                press1 = press2;  
+                printf("\nMilliseconds from the previous button press: %d\n", difference);
+                print_mqtt("Zumo99/button",  "%d", difference);
+                //button is pressed
+                while(SW1_Read() == 0)vTaskDelay(10);  
+                BatteryLed_Write(1);
+                
+        }
+              
+                
+    
+}
+
+void assignment_week5_2()
+{
+    
+    launch_system(true, true, false, true);
+
+
+            while(1)
+            {
+                if(Ultra_GetDistance() < 11){
+                    motor_forward(0,0);
+                    vTaskDelay(500);
+                    motor_backward(100,300);
+                    if(rand()%2 == 1)
+                    {
+
+                        tank_turn_right(100,262);
+                        print_mqtt("Zumo99/turn: ", "%s", "right");
+                    }
+                        else
+                    {
+                        tank_turn_left(100,262);
+                        print_mqtt("Zumo99/turn", "%s", "left");
+                    }
+                    
+                }
+                            motor_forward(200,10);
+            }
+
+
+          
+            
+    
+}
+
+//Function that allows to follow the line
+void line_follower(struct sensors_ *sensors)
+{ 
+     reflectance_digital(sensors);
+   //Going through the intersection
+    while(getRefValues(sensors, 1, 1,1,1,1,1))
+    {
+        motor_forward(100,10);
+        reflectance_digital(sensors);
+    }
+
+
+    while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
+    {
+        //Left Turn
+        while(sensors->R2 == 0 && sensors->L2 == 1)
+        {
+            tank_turn_left(255,1);
+            reflectance_digital(sensors);
+        }
+        //Right Turn
+        while(sensors->R2 == 1 && sensors->L2 == 0)
+        {
+            tank_turn_right(255, 1);
+            reflectance_digital(sensors);
+        }
+        
+        //Left turn over 90 degrees
+        while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
+        {
+            tank_turn_left(255, 1);
+            reflectance_digital(sensors);
+        }
+        //Right turn over 90 degrees
+         while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
+        {
+            tank_turn_right(255, 1);
+            reflectance_digital(sensors);
+        }
+        motor_forward(200, 10);
+        reflectance_digital(sensors);
+    }
+//Stopping the motors
+    motor_forward(0,0);
 }
 
 
 
 
-void line_follower();
-int getRefValues (struct sensors_ *sensors, int SL3, int SL2, int SL1, int SR1, int SR2, int SR3)
+
+
+
+
+
+int getRefValues (struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3)
 {
- if (sensors->L1 == SL1 && sensors->L2 == SL2 && sensors->L3 == SL3 && sensors->R1 == SR1 && sensors->R2 == SR2 &&sensors->R3 == SR3 )
+ if (sensors->L1 == L1 && sensors->L2 == L2 && sensors->L3 == L3 && sensors->R1 == R1 && sensors->R2 == R2 &&sensors->R3 == R3 )
 {
+   
     return 1;
 }else
 {
+    
     return 0;
 }
 }
+
 /* [] END OF FILE */
