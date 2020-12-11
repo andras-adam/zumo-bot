@@ -334,7 +334,8 @@ void assignment_week5_3()
         BatteryLed_Write(0);
         vTaskDelay(1000);
     
-
+        while (SW1_Read() == 1)
+        {
             line_follower(&sensors);
             if(line1)
             {
@@ -346,18 +347,59 @@ void assignment_week5_3()
                 IR_flush();
                 IR_wait();
                 line1 = xTaskGetTickCount();
-        
+        }
 }
  
 
-
-
-
-
+void project_line()
+{
+    
+     //variables declaration and engine launch
+    int lines = 0;
+    struct sensors_ sensors;
+    TickType_t launch = 0;
+    TickType_t shutt = 0;
+    
+    launch_system(true, true, true, true);
+    
+    //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+        
+            while(lines <3)
+            {
+                line_follower_bonus(&sensors, &launch);
+                lines++;
+                //Checking on which line we are
+                printf("We on line %d\n", lines);
+                 //Waiting for the IR-signal
+                 if(lines == 1)
+                {
+                    print_mqtt("Zumo99/ready", "line");       
+                    IR_flush();
+                    IR_wait();
+                    launch = xTaskGetTickCount();
+                    print_mqtt("Zumo99/start","%d", launch);
+                }else if(lines == 3)
+                {
+                    shutt = xTaskGetTickCount();
+                    print_mqtt("Zumo99/stop","%d", shutt);
+                    int difference = (int)(shutt)-(int)(launch);
+                    print_mqtt("Zumo99/time", "%d", difference);
+                    //bonus features
+                }
+               
+            }
+     shut();
+}
 
 //Function that allows to follow the line
 void line_follower(struct sensors_ *sensors)
 { 
+
      reflectance_digital(sensors);
    //Going through the intersection
     while(getRefValues(sensors, 1, 1,1,1,1,1))
@@ -394,9 +436,68 @@ void line_follower(struct sensors_ *sensors)
             tank_turn_right(255, 1);
             reflectance_digital(sensors);
         }
+
         motor_forward(100, 10);
         reflectance_digital(sensors);
     }
+    motor_forward(0,0);
+}
+    
+//Function that allows to follow the line
+void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch)
+{ 
+     bool on_line = true;
+     reflectance_digital(sensors);
+   //Going through the intersection
+    while(getRefValues(sensors, 1, 1,1,1,1,1))
+    {
+        motor_forward(100,10);
+        reflectance_digital(sensors);
+    }
+
+
+        while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
+        {
+            //Left Turn
+            while(sensors->R2 == 0 && sensors->L2 == 1)
+            {
+                tank_turn_left(255,1);
+                reflectance_digital(sensors);
+            }
+            //Right Turn
+            while(sensors->R2 == 1 && sensors->L2 == 0)
+            {
+                tank_turn_right(255, 1);
+                reflectance_digital(sensors);
+            }
+            //These are bonus features, for example on a track "rectangle", the third turn is over 90 degrees
+            //Left turn over 90 degrees
+            while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
+            {
+                tank_turn_left(255, 1);
+                reflectance_digital(sensors);
+            }
+            //Right turn over 90 degrees
+             while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
+            {
+                tank_turn_right(255, 1);
+                reflectance_digital(sensors);
+            }
+             if(on_line == true && getRefValues(sensors, 0,0,0,0,0,0))
+                    { 
+                            on_line = false;
+                            
+                            print_mqtt("Zumo99/miss", "%d", xTaskGetTickCount()-*launch);
+                    } else if(on_line == false && getRefValues(sensors, 0,0,1,1,0,0))
+                    {
+                            on_line = true;
+                            print_mqtt("Zumo99/line", "%d", xTaskGetTickCount()-*launch);
+                    
+                    }
+            motor_forward(100, 10);
+            reflectance_digital(sensors);
+    }
+
 //Stopping the motors
     motor_forward(0,0);
 }

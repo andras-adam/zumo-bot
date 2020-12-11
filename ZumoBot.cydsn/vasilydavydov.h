@@ -35,6 +35,7 @@ void shut(void);
 void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic);
 int getRefValues (struct sensors_ *sensors, int SL3, int SL2, int SL1, int SR1, int SR2, int SR3);
 void line_follower(struct sensors_ *sensors);
+void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch);
 void obstacle();
 void tank_turn_right(uint8 speed,uint32 delay);
 void tank_turn_left(uint8 speed,uint32 delay);
@@ -46,7 +47,9 @@ void assignment_week4_2 (void);
 void assignment_week4_3(void);
 void assignment_week5_1(void);
 void assignment_week5_2(void);
-void assignment_week5_3();
-
+void assignment_week5_3(void);
+void project_line(void);
+void project_sumo(void);
+void project_maze(void);
 
 /* [] END OF FILE */
