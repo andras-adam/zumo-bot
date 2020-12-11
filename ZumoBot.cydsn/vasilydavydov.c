@@ -1,18 +1,15 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * Vasily Davydov 
+ * Zumo Robot Project
+ * Project made with András Ádám 
+ * Metropolia
+ * 2020
  * ========================================
 */
 #include <vasilydavydov.h>
 
 // Function for assignment 1-1
-/*void assignment_week3_1(void) {
+void assignment_week3_1(void) {
 
 
 motor_start();
@@ -34,7 +31,7 @@ motor_forward(0, 0);
     shut();
 
 }
-*/
+
 void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
 {
             printf("\nPreparing for a stratup\n");
