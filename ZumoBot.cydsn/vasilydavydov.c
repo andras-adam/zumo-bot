@@ -443,7 +443,7 @@ void line_follower(struct sensors_ *sensors)
     motor_forward(0,0);
 }
     
-//Function that allows to follow the line
+//Function that allows to follow the line of the project
 void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch)
 { 
      bool on_line = true;
@@ -483,6 +483,7 @@ void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch)
                 tank_turn_right(255, 1);
                 reflectance_digital(sensors);
             }
+            //bonus features for the project
              if(on_line == true && getRefValues(sensors, 0,0,0,0,0,0))
                     { 
                             on_line = false;
