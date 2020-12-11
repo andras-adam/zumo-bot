@@ -42,7 +42,7 @@
 void zmain(void) {
 
     // Call function here
-assignment_week5_2();
+void assignment_week5_3();
 
     printf("Everything works\n");
 

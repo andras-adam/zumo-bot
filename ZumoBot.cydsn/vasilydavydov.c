@@ -63,6 +63,7 @@ void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
             {
                 Ultra_Start();
             }
+            
            printf("\nStartup Done Successfully!\n");
                 
 }            
@@ -175,7 +176,7 @@ void assignment_week4_2()
         BatteryLed_Write(0);
         vTaskDelay(1000);
         
-            while(lines <2)
+            while(lines <3)
             {
                 line_follower(&sensors);
                 lines++;
@@ -286,13 +287,15 @@ void assignment_week5_2()
     
     launch_system(true, true, false, true);
 
-
+            //eternal loop
             while(1)
             {
+                //sensor gets the obstacle
                 if(Ultra_GetDistance() < 11){
                     motor_forward(0,0);
                     vTaskDelay(500);
                     motor_backward(100,300);
+                    //making a decision
                     if(rand()%2 == 1)
                     {
 
@@ -306,6 +309,7 @@ void assignment_week5_2()
                     }
                     
                 }
+                            //continues to roll                
                             motor_forward(200,10);
             }
 
@@ -314,6 +318,41 @@ void assignment_week5_2()
             
     
 }
+
+
+void assignment_week5_3()
+{
+
+    int difference;
+    struct sensors_ sensors;
+    TickType_t line1 = 0;
+    TickType_t line2 = 0;
+    launch_system(true, true, true, true);
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+    
+   
+        line_follower(&sensors);
+        if(line1)
+        {
+            line2 = xTaskGetTickCount();
+            difference = (int)(line2)-(int)(line1);
+            print_mqtt("Zumo99/lap", "%d", difference);
+            
+        }
+        IR_flush();
+        IR_wait();
+        line1 = xTaskGetTickCount();
+}
+ 
+
+
+
+
+
 
 //Function that allows to follow the line
 void line_follower(struct sensors_ *sensors)
@@ -341,7 +380,7 @@ void line_follower(struct sensors_ *sensors)
             tank_turn_right(255, 1);
             reflectance_digital(sensors);
         }
-        
+        //These are bonus features, for example on a track "rectangle", the third turn is over 90 degrees
         //Left turn over 90 degrees
         while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
         {
