@@ -323,10 +323,10 @@ void assignment_week5_2()
 void assignment_week5_3()
 {
 
-    int difference;
     struct sensors_ sensors;
     TickType_t line1 = 0;
     TickType_t line2 = 0;
+    int difference;
     launch_system(true, true, true, true);
         BatteryLed_Write(1);
         //Starting the function, when the button is pressed
@@ -334,18 +334,19 @@ void assignment_week5_3()
         BatteryLed_Write(0);
         vTaskDelay(1000);
     
-   
-        line_follower(&sensors);
-        if(line1)
-        {
-            line2 = xTaskGetTickCount();
-            difference = (int)(line2)-(int)(line1);
-            print_mqtt("Zumo99/lap", "%d", difference);
-            
-        }
-        IR_flush();
-        IR_wait();
-        line1 = xTaskGetTickCount();
+
+            line_follower(&sensors);
+            if(line1)
+            {
+                line2 = xTaskGetTickCount();
+                difference = (int)(line2)-(int)(line1);
+                print_mqtt("Zumo99/lap", "%d", difference);
+                
+            }
+                IR_flush();
+                IR_wait();
+                line1 = xTaskGetTickCount();
+        
 }
  
 
@@ -393,7 +394,7 @@ void line_follower(struct sensors_ *sensors)
             tank_turn_right(255, 1);
             reflectance_digital(sensors);
         }
-        motor_forward(200, 10);
+        motor_forward(100, 10);
         reflectance_digital(sensors);
     }
 //Stopping the motors
