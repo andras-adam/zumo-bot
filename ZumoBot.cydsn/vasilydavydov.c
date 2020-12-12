@@ -393,6 +393,9 @@ void project_line()
      shut();
 }
 
+
+
+
 //Function that allows to follow the line
 void line_follower(struct sensors_ *sensors)
 { 
