@@ -395,6 +395,90 @@ void project_line()
 
 
 
+void project_sumo()
+{
+    //variables declaration and engine launch
+    int turn_dir = rand()%2;
+    struct sensors_ sensors;
+    TickType_t launch = 0;
+    TickType_t shutt = 0;
+    
+    launch_system(true, true, true, true);
+    
+    //Switching the LED on
+        BatteryLed_Write(1);
+        //Starting the function, when the button is pressed
+        while(SW1_Read() == 1);
+        BatteryLed_Write(0);
+        vTaskDelay(1000);
+        
+        line_follower(&sensors);
+        IR_flush();
+        IR_wait();
+        
+        while(getRefValues(&sensors, 1,1,1,1,1,1))
+        {
+            motor_forward(200,10);
+            reflectance_digital(&sensors);
+        }
+        motor_forward(0,0);
+
+        //allow this function to work while the button is not pressed
+        while(SW1_Read() == 1)
+        {
+            //recognizing the obstacle
+            if(Ultra_GetDistance() < 10)
+            {
+                motor_forward(0,0);
+                if(turn_dir == 1)
+                {
+                    tank_turn_left(150, 262);
+                    motor_forward(200,1);
+                    reflectance_digital(&sensors);
+                }else
+                {
+                    tank_turn_right(150, 262);
+                    motor_forward(200,1);
+                    reflectance_digital(&sensors);
+                }
+
+            }
+            //Turning back from the edges
+            if(sensors.R3 == 1)
+            {
+                motor_forward(0,0);
+                while(!getRefValues(&sensors,0,0,0,0,0,0))
+                {
+                    tank_turn_left(255,rand()%150+50);
+                    reflectance_digital(&sensors);
+                }
+            }else if(sensors.L3 == 1)
+            {
+                motor_forward(0,0);
+                while(!getRefValues(&sensors,0,0,0,0,0,0))
+                {
+                    tank_turn_right(255,rand()%150+50);
+                    reflectance_digital(&sensors);
+                }
+            }
+                motor_forward(200,1);
+                reflectance_digital(&sensors);
+            
+                    
+                    
+        }
+        //shutting down        
+        motor_forward(0, 0);
+        shut();
+
+}
+
+
+
+
+
+
+
 
 //Function that allows to follow the line
 void line_follower(struct sensors_ *sensors)

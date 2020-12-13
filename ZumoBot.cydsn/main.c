@@ -43,7 +43,7 @@
 void zmain(void) {
 
     // Call function here
-maze_main();
+    project_sumo();
 
     printf("Everything works\n");
 
