@@ -524,7 +524,7 @@ void shut(void){
     
 
 
-// function for recongnising obstacles
+// function for turn after the obstacle
 void obstacle (){
     motor_forward(0,10);
     motor_backward(100, 150);
