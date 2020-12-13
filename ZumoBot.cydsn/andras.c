@@ -1,9 +1,6 @@
-/* =========================================
- *
- * Assignment solutions by András Ádám, 2020
- *
- * =========================================
-*/
+//
+// Assignment solutions by András Ádám, 2020
+//
 
 #include <andras.h>
 
@@ -446,7 +443,7 @@ void maze_turn(struct sensors_ *sensors, struct maze_position *pos, int final_di
         SetMotors(0, 0, turn_direction >= 0 ? 20 : 200, turn_direction >= 0 ? 200 : 20, 1);
         reflectance_digital(sensors);    
     }
-    SetMotors(0, 0, turn_direction >= 0 ? 20 : 200, turn_direction >= 0 ? 200 : 20, 15); // Correction
+    // SetMotors(0, 0, turn_direction >= 0 ? 20 : 200, turn_direction >= 0 ? 200 : 20, 15); // Correction
     int time = xTaskGetTickCount() - start;
     
     // Make turn, reverse back to initial if obstacle is found
@@ -477,7 +474,7 @@ void maze_line(struct sensors_ *sensors) {
         float x = (float) (Ultra_GetDistance()) / 15.0f;
         if (x <= 0.7) {
             motor_forward(0, 0);
-            printf("Obstacle encountered 2. %f\n", x);;
+            printf("Obstacle encountered 2. %f\n", x);
             while (true) vTaskDelay(200);
         }
         
@@ -505,7 +502,7 @@ void maze_line(struct sensors_ *sensors) {
         float x = (float) (Ultra_GetDistance()) / 15.0f;
         if (x <= 0.7) {
             motor_forward(0, 0);
-            printf("Obstacle encountered 2. %f\n", x);;
+            printf("Obstacle encountered 2. %f\n", x);
             while (true) vTaskDelay(200);
         }
         
@@ -632,5 +629,3 @@ int sensor_OR(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, 
         return 0;
     }
 }
-
-/* [] END OF FILE */

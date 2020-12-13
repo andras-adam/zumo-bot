@@ -8,9 +8,9 @@
 #define START_MQTT 1
 
 /* The following definitions must all be in double quotes */
-#define NETWORK_SSID "VFILMS"
+#define NETWORK_SSID ""
 
-#define NETWORK_PASSWORD "12345678"
+#define NETWORK_PASSWORD ""
 
 #define MQTT_BROKER "192.168.1.179"  
     

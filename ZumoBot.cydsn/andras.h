@@ -1,9 +1,6 @@
-/* =========================================
- *
- * Assignment solutions by András Ádám, 2020
- *
- * =========================================
-*/
+//
+// Assignment solutions by András Ádám, 2020
+//
 
 #include <project.h>
 #include <stdio.h>
@@ -49,5 +46,3 @@ void tank_turn(int16 angle);
 void wait_for_IR(void);
 int sensor_AND(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3);
 int sensor_OR(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3);
-
-/* [] END OF FILE */
