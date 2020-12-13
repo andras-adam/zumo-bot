@@ -1,14 +1,23 @@
 /* ========================================
  * Vasily Davydov 
  * Zumo Robot Project
- * Project made with András Ádám 
+ * Projects made with András Ádám 
  * Metropolia
  * 2020
  * ========================================
 */
 #include <vasilydavydov.h>
 
-// Function for assignment 1-1
+
+/*
+List of contains in this file:
+- Tasks (lines 21-321)
+- Projects (lines 335-468)
+- Functions for Tasks & Projects (lines 487-657)
+- Project Maze is contained in a separate file called "maze.c"
+*/
+
+//                                    TASKS START HERE
 void assignment_week3_1(void) {
 
 
@@ -32,52 +41,7 @@ motor_forward(0, 0);
 
 }
 
-void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
-{
-            printf("\nPreparing for a stratup\n");
-    
-            //motor starts  
-            if (motor)
-            {
-            motor_start();              
-            motor_forward(0, 0);
- 
-            }
-            //IR starts
-            if (IR)
-            {
-            IR_Start();
-            IR_flush();
-            }
-            //reflectance startup
-            if (reflectance)
-            {
-                reflectance_start();
-                reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
-            }
-            //ultrasonic starts
-            if (ultrasonic)
-            {
-                Ultra_Start();
-            }
-            
-           printf("\nStartup Done Successfully!\n");
-                
-}            
 
-void shut(void){
-    motor_forward(0,0);
-    motor_stop();
-}
-    
-
-
-// function for recongnising obstacles
-void obstacle (){
-    motor_forward(0,10);
-    motor_backward(100, 150);
-    motor_turn(0, 150, 462);
-}
 
 
 
@@ -137,6 +101,7 @@ motor_stop();
 
 
 
+
 void assignment_week4_1()
 { 
     //variables declaration and engine launch
@@ -159,6 +124,8 @@ void assignment_week4_1()
             
     }  
 }   
+
+
 
 void assignment_week4_2()
 {
@@ -191,7 +158,9 @@ void assignment_week4_2()
             shut();
          
 }
-        
+
+
+
 void assignment_week4_3()
 {
      //variables declaration and engine launch
@@ -246,6 +215,8 @@ void assignment_week4_3()
            
 }
 
+
+
 void assignment_week5_1()
 {
     TickType_t press1= xTaskGetTickCount();
@@ -278,6 +249,8 @@ void assignment_week5_1()
                 
     
 }
+
+
 
 void assignment_week5_2()
 {
@@ -346,8 +319,18 @@ void assignment_week5_3()
                 line1 = xTaskGetTickCount();
         }
 }
- 
+//                                    TASKS END HERE 
 
+
+
+
+
+
+
+
+
+
+//                                    PROJECTS START HERE
 void project_line()
 {
     
@@ -405,20 +388,25 @@ void project_sumo()
     
     launch_system(true, true, true, true);
     
-    //Switching the LED on
+
+        //Switching the LED on
         BatteryLed_Write(1);
         //Starting the function, when the button is pressed
         while(SW1_Read() == 1);
         BatteryLed_Write(0);
         vTaskDelay(1000);
         
+        launch = xTaskGetTickCount();
         line_follower(&sensors);
+        print_mqtt("Zumo99/ready","zumo");
         IR_flush();
         IR_wait();
+        print_mqtt("Zumo99/start", "%d", launch);
+        
         
         while(getRefValues(&sensors, 1,1,1,1,1,1))
         {
-            motor_forward(200,10);
+            motor_forward(200,150);
             reflectance_digital(&sensors);
         }
         motor_forward(0,0);
@@ -429,6 +417,7 @@ void project_sumo()
             //recognizing the obstacle
             if(Ultra_GetDistance() < 10)
             {
+                print_mqtt("Zumo99/obstacle", "%d", xTaskGetTickCount());
                 motor_forward(0,0);
                 if(turn_dir == 1)
                 {
@@ -443,7 +432,7 @@ void project_sumo()
                 }
 
             }
-            //Turning back from the edges
+            //Turning back from edges
             if(sensors.R3 == 1)
             {
                 motor_forward(0,0);
@@ -467,17 +456,80 @@ void project_sumo()
                     
                     
         }
-        //shutting down        
+        BatteryLed_Write(1);
         motor_forward(0, 0);
+        shutt = xTaskGetTickCount();
+        print_mqtt("Zumo99/stop", "%d", shutt);
+        print_mqtt("Zumo99/time", "%d", shutt - launch);
+        //shutting down        
         shut();
 
 }
+//                                    PROJECTS END HERE (MAZE IS IN "maze.c")
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+//                                    FUNCTIONS START HERE
+// function to launch the engine
+void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
+{
+            printf("\nPreparing for a stratup\n");
+    
+            //motor starts  
+            if (motor)
+            {
+            motor_start();              
+            motor_forward(0, 0);
+ 
+            }
+            //IR starts
+            if (IR)
+            {
+            IR_Start();
+            IR_flush();
+            }
+            //reflectance startup
+            if (reflectance)
+            {
+                reflectance_start();
+                reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+            }
+            //ultrasonic starts
+            if (ultrasonic)
+            {
+                Ultra_Start();
+            }
+            
+           printf("\nStartup Done Successfully!\n");
+                
+}            
+
+// function that shuts the robot
+void shut(void){
+    motor_forward(0,0);
+    motor_stop();
+}
+    
+
+
+// function for recongnising obstacles
+void obstacle (){
+    motor_forward(0,10);
+    motor_backward(100, 150);
+    motor_turn(0, 150, 462);
+}
 
 
 //Function that allows to follow the line
@@ -521,7 +573,7 @@ void line_follower(struct sensors_ *sensors)
             reflectance_digital(sensors);
         }
 
-        motor_forward(100, 10);
+        motor_forward(150, 10);
         reflectance_digital(sensors);
     }
     motor_forward(0,0);
@@ -589,12 +641,6 @@ void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch)
 
 
 
-
-
-
-
-
-
 int getRefValues (struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3)
 {
  if (sensors->L1 == L1 && sensors->L2 == L2 && sensors->L3 == L3 && sensors->R1 == R1 && sensors->R2 == R2 &&sensors->R3 == R3 )
@@ -607,5 +653,5 @@ int getRefValues (struct sensors_ *sensors, int L3, int L2, int L1, int R1, int 
     return 0;
 }
 }
-
+//                                    FUNCTIONS END HERE
 /* [] END OF FILE */
