@@ -1,14 +1,31 @@
-
 # Zumo Bot (with Metropolia PSoC Adapter)
 
-A project to control a Zumo Bot using the Metropolia PSoC Adapter. Assignments include line following and obstacle evasion, using reflectance, IR and ultrasonic sensors. The project was meant to be completed as a team assignment for 2-3 persons.
+Controlling a Zumo Bot using the Metropolia PSoC Adapter. Assignments include line following and obstacle evasion; using reflectance, IR and ultrasonic sensors. The project was meant to be completed as a team assignment for 2-3 persons.
 
 #### Team members
 * [András Ádám](https://github.com/NeoAren) ([andras.h](/ZumoBot.cydsn/andras.h), [andras.c](/ZumoBot.cydsn/andras.c))
 * [Vasily Davydov](https://github.com/vas-dav) ([vasilydavydov.h](/ZumoBot.cydsn/vasilydavydov.h), [vasilydavydov.c](/ZumoBot.cydsn/vasilydavydov.c))
 
 #### Metropolia PSoC Adapter
-- Example code available [here](/Documentation.md)
+- Documentation available [here](/Documentation.md)
+
+#### Table of contents
+- [Motor control and distance sensor](#motor-control-and-distance-sensor)
+	- [Assignment 1-1](#assignment-1-1)
+	- [Assignment 1-2](#assignment-1-2)
+	- [Assignment 1-3](#assignment-1-3)
+- [Reflectance sensors and IR sensor](#reflectance-sensors-and-ir-sensor)
+  	- [Assignment 2-1](#assignment-2-1)
+	- [Assignment 2-2](#assignment-2-2)
+	- [Assignment 2-3](#assignment-2-3)
+- [MQTT](#mqtt)
+  	- [Assignment 3-1](#assignment-3-1)
+	- [Assignment 3-2](#assignment-3-2)
+	- [Assignment 3-3](#assignment-3-3)
+- [Projects](#projects)
+  	- [Sumo wrestling](#sumo-wrestling)
+	- [Line following](#line-following)
+	- [Maze solving](#maze-solving)
 
 ## Motor control and distance sensor
 In all following exercises the robot must wait for user button to be pressed before it starts running
@@ -47,7 +64,7 @@ Write a program that runs the robot to a line. When the line is reached the robo
 
 ## Projects
 
-### Project 1: Sumo wrestling
+### Sumo wrestling
 **Track**: sumo_ring_w_obstacle
 
 Robot must drive along the line to the edge of the sumo ring and wait for start signal. The start signal is
@@ -84,7 +101,7 @@ Zumo028/stop 5210
 Zumo028/time 2909
 ```
 
-### Project 2: Line follower
+### Line following
 **Track**: race_track
 
 Robot follows the black line using reflective sensors in the front of the robot. Track total length is about 10 meters. Robot has six reflective sensors. The center sensors are used mainly to keep the robot on the track and side sensors to detect intersections or tight curves on the track. The robot must follow the start and stop rules stated below. The intersections are in a 90-degree angle on a straight line. The competition track is 2 cm wide. Make the robot run as fast as possible.
@@ -130,7 +147,7 @@ Zumo028/stop 54290
 Zumo028/time 53080
 ```
 
-### Project 3: Maze
+### Maze solving
 **Track**: Grid_x (where x ∈ {1, 2, 3, 4, 5})
 
 Robot finds a path through a grid by following lines and taking turns at intersections to avoid obstacles.
