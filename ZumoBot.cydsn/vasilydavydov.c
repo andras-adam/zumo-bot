@@ -6,6 +6,7 @@
  * 2020
  * ========================================
 */
+#include <andras.h>
 #include <vasilydavydov.h>
 
 
@@ -14,7 +15,6 @@ List of contains in this file:
 - Tasks (lines 21-321)
 - Projects (lines 335-468)
 - Functions for Tasks & Projects (lines 487-657)
-- Project Maze is contained in a separate file called "maze.c"
 */
 
 //                                    TASKS START HERE
@@ -465,179 +465,7 @@ void project_sumo()
         shut();
 
 }
-//                                    PROJECTS END HERE (MAZE IS IN "maze.c")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//                                    FUNCTIONS START HERE
-// function to launch the engine
-void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
-{
-            printf("\nPreparing for a stratup\n");
-    
-            //motor starts  
-            if (motor)
-            {
-            motor_start();              
-            motor_forward(0, 0);
- 
-            }
-            //IR starts
-            if (IR)
-            {
-            IR_Start();
-            IR_flush();
-            }
-            //reflectance startup
-            if (reflectance)
-            {
-                reflectance_start();
-                reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
-            }
-            //ultrasonic starts
-            if (ultrasonic)
-            {
-                Ultra_Start();
-            }
-            
-           printf("\nStartup Done Successfully!\n");
-                
-}            
-
-// function that shuts the robot
-void shut(void){
-    motor_forward(0,0);
-    motor_stop();
-}
-    
-
-
-// function for turn after the obstacle
-void obstacle (){
-    motor_forward(0,10);
-    motor_backward(100, 150);
-    motor_turn(0, 150, 462);
-}
-
-
-//Function that allows to follow the line
-void line_follower(struct sensors_ *sensors)
-{ 
-
-     reflectance_digital(sensors);
-   //Going through the intersection
-    while(getRefValues(sensors, 1, 1,1,1,1,1))
-    {
-        motor_forward(100,10);
-        reflectance_digital(sensors);
-    }
-
-
-    while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
-    {
-        //Left Turn
-        while(sensors->R2 == 0 && sensors->L2 == 1)
-        {
-            tank_turn_left(255,1);
-            reflectance_digital(sensors);
-        }
-        //Right Turn
-        while(sensors->R2 == 1 && sensors->L2 == 0)
-        {
-            tank_turn_right(255, 1);
-            reflectance_digital(sensors);
-        }
-        //These are bonus features, for example on a track "rectangle", the third turn is over 90 degrees
-        //Left turn over 90 degrees
-        while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
-        {
-            tank_turn_left(255, 1);
-            reflectance_digital(sensors);
-        }
-        //Right turn over 90 degrees
-         while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
-        {
-            tank_turn_right(255, 1);
-            reflectance_digital(sensors);
-        }
-
-        motor_forward(150, 10);
-        reflectance_digital(sensors);
-    }
-    motor_forward(0,0);
-}
-    
-//Function that allows to follow the line of the project
-void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch)
-{ 
-     bool on_line = true;
-     reflectance_digital(sensors);
-   //Going through the intersection
-    while(getRefValues(sensors, 1, 1,1,1,1,1))
-    {
-        motor_forward(100,10);
-        reflectance_digital(sensors);
-    }
-
-
-        while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
-        {
-            //Left Turn
-            while(sensors->R2 == 0 && sensors->L2 == 1)
-            {
-                tank_turn_left(255,1);
-                reflectance_digital(sensors);
-            }
-            //Right Turn
-            while(sensors->R2 == 1 && sensors->L2 == 0)
-            {
-                tank_turn_right(255, 1);
-                reflectance_digital(sensors);
-            }
-            //These are bonus features, for example on a track "rectangle", the third turn is over 90 degrees
-            //Left turn over 90 degrees
-            while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
-            {
-                tank_turn_left(255, 1);
-                reflectance_digital(sensors);
-            }
-            //Right turn over 90 degrees
-             while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
-            {
-                tank_turn_right(255, 1);
-                reflectance_digital(sensors);
-            }
-            //bonus features for the project
-             if(on_line == true && getRefValues(sensors, 0,0,0,0,0,0))
-                    { 
-                            on_line = false;
-                            
-                            print_mqtt("Zumo99/miss", "%d", xTaskGetTickCount()-*launch);
-                    } else if(on_line == false && getRefValues(sensors, 0,0,1,1,0,0))
-                    {
-                            on_line = true;
-                            print_mqtt("Zumo99/line", "%d", xTaskGetTickCount()-*launch);
-                    
-                    }
-            motor_forward(100, 10);
-            reflectance_digital(sensors);
-    }
-
-//Stopping the motors
-    motor_forward(0,0);
-}
 
 void maze_main () 
 {
@@ -851,6 +679,181 @@ void turn_maze(struct sensors_ *sensors, struct position *pos,int final_directio
     motor_forward(0,0);
 }
 
+
+
+//                                    PROJECTS END HERE (MAZE IS IN "maze.c")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//                                    FUNCTIONS START HERE
+// function to launch the engine
+void launch_system(bool motor, bool IR, bool reflectance, bool ultrasonic)
+{
+            printf("\nPreparing for a stratup\n");
+    
+            //motor starts  
+            if (motor)
+            {
+            motor_start();              
+            motor_forward(0, 0);
+ 
+            }
+            //IR starts
+            if (IR)
+            {
+            IR_Start();
+            IR_flush();
+            }
+            //reflectance startup
+            if (reflectance)
+            {
+                reflectance_start();
+                reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+            }
+            //ultrasonic starts
+            if (ultrasonic)
+            {
+                Ultra_Start();
+            }
+            
+           printf("\nStartup Done Successfully!\n");
+                
+}            
+
+// function that shuts the robot
+void shut(void){
+    motor_forward(0,0);
+    motor_stop();
+}
+    
+
+
+// function for turn after the obstacle
+void obstacle (){
+    motor_forward(0,10);
+    motor_backward(100, 150);
+    motor_turn(0, 150, 462);
+}
+
+
+//Function that allows to follow the line
+void line_follower(struct sensors_ *sensors)
+{ 
+
+     reflectance_digital(sensors);
+   //Going through the intersection
+    while(getRefValues(sensors, 1, 1,1,1,1,1))
+    {
+        motor_forward(100,10);
+        reflectance_digital(sensors);
+    }
+
+
+    while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
+    {
+        //Left Turn
+        while(sensors->R2 == 0 && sensors->L2 == 1)
+        {
+            tank_turn_left(255,1);
+            reflectance_digital(sensors);
+        }
+        //Right Turn
+        while(sensors->R2 == 1 && sensors->L2 == 0)
+        {
+            tank_turn_right(255, 1);
+            reflectance_digital(sensors);
+        }
+        //These are bonus features, for example on a track "rectangle", the third turn is over 90 degrees
+        //Left turn over 90 degrees
+        while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
+        {
+            tank_turn_left(255, 1);
+            reflectance_digital(sensors);
+        }
+        //Right turn over 90 degrees
+         while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
+        {
+            tank_turn_right(255, 1);
+            reflectance_digital(sensors);
+        }
+
+        motor_forward(150, 10);
+        reflectance_digital(sensors);
+    }
+    motor_forward(0,0);
+}
+    
+//Function that allows to follow the line of the project
+void line_follower_bonus (struct sensors_ *sensors, TickType_t *launch)
+{ 
+     bool on_line = true;
+     reflectance_digital(sensors);
+   //Going through the intersection
+    while(getRefValues(sensors, 1, 1,1,1,1,1))
+    {
+        motor_forward(100,10);
+        reflectance_digital(sensors);
+    }
+
+
+        while(!getRefValues(sensors, 1, 1, 1, 1, 1, 1))
+        {
+            //Left Turn
+            while(sensors->R2 == 0 && sensors->L2 == 1)
+            {
+                tank_turn_left(255,1);
+                reflectance_digital(sensors);
+            }
+            //Right Turn
+            while(sensors->R2 == 1 && sensors->L2 == 0)
+            {
+                tank_turn_right(255, 1);
+                reflectance_digital(sensors);
+            }
+            //These are bonus features, for example on a track "rectangle", the third turn is over 90 degrees
+            //Left turn over 90 degrees
+            while(sensors->R2 == 1 && sensors->R3 == 0 && sensors->L2 == 1 && sensors->L3 == 1)
+            {
+                tank_turn_left(255, 1);
+                reflectance_digital(sensors);
+            }
+            //Right turn over 90 degrees
+             while(sensors->R2 == 1 && sensors->R3 == 1 && sensors->L2 == 1 && sensors->L3 == 0)
+            {
+                tank_turn_right(255, 1);
+                reflectance_digital(sensors);
+            }
+            //bonus features for the project
+             if(on_line == true && getRefValues(sensors, 0,0,0,0,0,0))
+                    { 
+                            on_line = false;
+                            
+                            print_mqtt("Zumo99/miss", "%d", xTaskGetTickCount()-*launch);
+                    } else if(on_line == false && getRefValues(sensors, 0,0,1,1,0,0))
+                    {
+                            on_line = true;
+                            print_mqtt("Zumo99/line", "%d", xTaskGetTickCount()-*launch);
+                    
+                    }
+            motor_forward(100, 10);
+            reflectance_digital(sensors);
+    }
+
+//Stopping the motors
+    motor_forward(0,0);
+}
 
 
 
