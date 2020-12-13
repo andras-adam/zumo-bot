@@ -34,14 +34,17 @@ void assignment_2_3(void);
 void assignment_3_1(void);
 void assignment_3_2(void);
 void assignment_3_3(void);
-
-void assignment_sumo_wrestling(void);
-void assignment_line_following(void);
+void assignment_sumo(void);
+void assignment_line(void);
 void assignment_maze(void);
+
+struct maze_position { int x; int y; int direction; };
 
 void startup(bool launch_button, bool motor, bool IR, bool reflectance, bool ultrasound);
 void shutdown(void);
 void follow_line(struct sensors_ *sensors, uint8 speed, uint32 delay);
+void maze_turn(struct sensors_ *sensors, struct maze_position *pos, int final_direction, int distance_limit);
+void maze_line(struct sensors_ *sensors);
 void tank_turn(int16 angle);
 void wait_for_IR(void);
 int sensor_AND(struct sensors_ *sensors, int L3, int L2, int L1, int R1, int R2, int R3);

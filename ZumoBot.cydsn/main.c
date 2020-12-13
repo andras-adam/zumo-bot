@@ -42,10 +42,7 @@
 
 void zmain(void) {
 
-    // Call function here();
-    maze_main();
-
-    printf("Everything works\n");
+    // Call function here
 
     // Sleep (in an infinite loop)
     while(true) vTaskDelay(100);

@@ -237,7 +237,7 @@ void assignment_3_3(void) {
 }
 
 // Function for assignment sumo-wrestling
-void assignment_sumo_wrestling(void) {
+void assignment_sumo(void) {
 
     // Define variables
     struct sensors_ sensors;
@@ -307,8 +307,8 @@ void assignment_sumo_wrestling(void) {
 
 }
 
-// Function for assignment line-follower
-void assignment_line_following(void) {
+// Function for assignment line-following
+void assignment_line(void) {
 
     // Define variables
     struct sensors_ sensors;
@@ -341,57 +341,180 @@ void assignment_line_following(void) {
 
 }
 
-// Function for assignment maze
+// Function for assignment maze-solving
 void assignment_maze(void) {
+    
+    // Define constants
+    const int north = 0;
+    const int east = 1;
+    const int west = -1;
+    const int x_limit = 3;
+    const int distance_limit = 15;
     
     // Define variables
     struct sensors_ sensors;
-    int intersect_distance = 15;
-    struct position {
-        int x;
-        int y;
-        char dir;
-    } pos;
-    int grid[12][7] = {{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};
+    struct maze_position pos = { 0, 0, north };
     
     // Start up robot (launch_button, motors, IR, reflectance, ultrasound)
     startup(true, true, true, true, true);
     
     // Navigate to start line
-    follow_line(&sensors, 255, 10);
+    maze_line(&sensors);
     wait_for_IR();
-    follow_line(&sensors, 255, 10);
+    maze_line(&sensors);
     
     // Navigate maze
-    while (pos.x != 12) {
+    while (pos.y < 11) {
         
-        // check distance
-        int d = Ultra_GetDistance() / intersect_distance + 1;
-        if (pos.dir == 'N') {
-            grid[pos.x + d][pos.y] = 1;
-        } else if (pos.dir == 'E') {
-            grid[pos.x][pos.y + d] = 1;
-        } else if (pos.dir == 'S') {
-            grid[pos.x - d][pos.y] = 1;
-        } else if (pos.dir == 'W') {
-            grid[pos.x][pos.y - d] = 1;
+        // Get distance
+        int distance = Ultra_GetDistance();
+        
+        // Go north if possible, update y coordinate
+        if (distance > distance_limit) {
+            maze_line(&sensors);
+            pos.y += 1;
+        } else {
+            
+            // Turn away from maze edges
+            if (pos.direction == north) {
+                if (pos.x == x_limit) {
+                    maze_turn(&sensors, &pos, west, distance_limit);
+                } else if (pos.x == -x_limit) {
+                    maze_turn(&sensors, &pos, east, distance_limit);
+                }
+            }
+            
+            // Turn towards west if possible, east otherwise
+            if (pos.direction == north) {
+                maze_turn(&sensors, &pos, west, distance_limit);
+                if (pos.direction != west) {
+                    maze_turn(&sensors, &pos, east, distance_limit);
+                }
+            }
+            
+            // Find path towards north
+            while (pos.direction != north) {
+                
+                // Go to next intersection, update x coordinate
+                maze_line(&sensors);
+                pos.x += pos.direction;
+                
+                // Try turning north
+                maze_turn(&sensors, &pos, north, distance_limit);
+                
+                // If cannot go north on maze edge, turn 180 degrees
+                if (pos.direction != north && pos.x == pos.direction*x_limit) {
+                    tank_turn(pos.direction*180);
+                    pos.direction = pos.direction*-1;
+                }
+                
+            }
+            
         }
         
-        //  if distance == 1, must turn
-        //      if N or W, turn -90, else turn 90
+        // Navigate to the finish line after completing the maze
+        if (pos.y == 11) {
+            if (pos.x != 0) {
+                maze_turn(&sensors, &pos, pos.x >= 0 ? -1 : 1, distance_limit);
+                while (pos.x != 0) {
+                    maze_line(&sensors);
+                    pos.x += pos.direction;
+                }
+                maze_turn(&sensors, &pos, north, distance_limit);
+            }
+            maze_line(&sensors);
+            maze_line(&sensors);
+            motor_forward(255, 300);
+        }
         
-        
-    }
-    
-    while (true) {
-        int d = Ultra_GetDistance();
-        printf("\nDistance is %d.\n", d);
-        follow_line(&sensors, 255, 10);
-        wait_for_IR();
     }
     
     // Shut down robot
     shutdown();
+    
+}
+
+// Maze turn
+void maze_turn(struct sensors_ *sensors, struct maze_position *pos, int final_direction, int distance_limit) {
+
+    // Set turn direction and start time
+    int8 turn_direction = pos->direction-final_direction >= 0 ? 1 : -1;
+    TickType_t start = xTaskGetTickCount();
+    
+    // Turn towards desired direction
+    while (!sensor_AND(sensors, 0, 0, 1, 1, 0, 0)) {
+        SetMotors(0, 0, turn_direction >= 0 ? 20 : 200, turn_direction >= 0 ? 200 : 20, 1);
+        reflectance_digital(sensors);    
+    }
+    SetMotors(0, 0, turn_direction >= 0 ? 20 : 200, turn_direction >= 0 ? 200 : 20, 15); // Correction
+    int time = xTaskGetTickCount() - start;
+    
+    // Make turn, reverse back to initial if obstacle is found
+    int distance = Ultra_GetDistance();
+    if (distance > distance_limit) {
+        pos->direction = final_direction;
+    } else {
+        SetMotors(1, 1, turn_direction >= 0 ? 20 : 200, turn_direction >= 0 ? 200 : 20, time);
+    }
+
+}
+
+// Maze line follower
+void maze_line(struct sensors_ *sensors) {
+    reflectance_digital(sensors);
+    
+    // Leave intersection forward
+    while (!sensor_AND(sensors, 0, 0, 1, 1, 0, 0)) {
+        while (sensors->R1 == 1 && sensors->L1 == 0) {
+            tank_turn(-1);
+            reflectance_digital(sensors);
+        }
+        while (sensors->L1 == 1 && sensors->R1 == 0) {
+            tank_turn(1);
+            reflectance_digital(sensors);
+        }
+        
+        float x = (float) (Ultra_GetDistance()) / 15.0f;
+        if (x <= 0.7) {
+            motor_forward(0, 0);
+            printf("Obstacle encountered 2. %f\n", x);;
+            while (true) vTaskDelay(200);
+        }
+        
+        motor_forward(200, 1);
+        reflectance_digital(sensors);
+    }
+    
+    // Follow line until next intersection
+    while (sensors->L3 == 0 && sensors->R3 == 0) {
+        if (sensors->R2 == 1 && sensors->L2 == 0) {
+            while (sensors->R2 == 1 && sensors->L2 == 0) {
+                tank_turn(-1);
+                reflectance_digital(sensors);
+            }
+            tank_turn(-5); // Correction
+        }
+        if (sensors->L2 == 1 && sensors->R2 == 0) {
+            while (sensors->L2 == 1 && sensors->R2 == 0) {
+                tank_turn(1);
+                reflectance_digital(sensors);
+            }
+            tank_turn(5); // Correction
+        }
+        
+        float x = (float) (Ultra_GetDistance()) / 15.0f;
+        if (x <= 0.7) {
+            motor_forward(0, 0);
+            printf("Obstacle encountered 2. %f\n", x);;
+            while (true) vTaskDelay(200);
+        }
+        
+        motor_forward(200, 1);
+        reflectance_digital(sensors);
+    }
+    
+    // Stop motors
+    motor_forward(0, 0);
     
 }
 
@@ -416,7 +539,7 @@ void startup(bool launch_button, bool motor, bool IR, bool reflectance, bool ult
     // Start reflectance
     if (reflectance) {
         reflectance_start();
-        reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+        reflectance_set_threshold(15000, 15000, 17000, 17000, 15000, 15000);
     }
     
     // Start ultrasound
