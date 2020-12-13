@@ -405,20 +405,25 @@ void project_sumo()
     
     launch_system(true, true, true, true);
     
-    //Switching the LED on
+
+        //Switching the LED on
         BatteryLed_Write(1);
         //Starting the function, when the button is pressed
         while(SW1_Read() == 1);
         BatteryLed_Write(0);
         vTaskDelay(1000);
         
+        launch = xTaskGetTickCount();
         line_follower(&sensors);
+        print_mqtt("Zumo99/ready","zumo");
         IR_flush();
         IR_wait();
+        print_mqtt("Zumo99/start", "%d", launch);
+        
         
         while(getRefValues(&sensors, 1,1,1,1,1,1))
         {
-            motor_forward(200,10);
+            motor_forward(200,150);
             reflectance_digital(&sensors);
         }
         motor_forward(0,0);
@@ -429,6 +434,7 @@ void project_sumo()
             //recognizing the obstacle
             if(Ultra_GetDistance() < 10)
             {
+                print_mqtt("Zumo99/obstacle", "%d", xTaskGetTickCount());
                 motor_forward(0,0);
                 if(turn_dir == 1)
                 {
@@ -443,7 +449,7 @@ void project_sumo()
                 }
 
             }
-            //Turning back from the edges
+            //Turning back from edges
             if(sensors.R3 == 1)
             {
                 motor_forward(0,0);
@@ -467,8 +473,12 @@ void project_sumo()
                     
                     
         }
-        //shutting down        
+        BatteryLed_Write(1);
         motor_forward(0, 0);
+        shutt = xTaskGetTickCount();
+        print_mqtt("Zumo99/stop", "%d", shutt);
+        print_mqtt("Zumo99/time", "%d", shutt - launch);
+        //shutting down        
         shut();
 
 }
@@ -521,7 +531,7 @@ void line_follower(struct sensors_ *sensors)
             reflectance_digital(sensors);
         }
 
-        motor_forward(100, 10);
+        motor_forward(150, 10);
         reflectance_digital(sensors);
     }
     motor_forward(0,0);

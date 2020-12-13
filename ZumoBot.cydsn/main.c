@@ -31,7 +31,7 @@
 
 #include <vasilydavydov.h>
 #include <andras.h>
-#include <maze.h>
+
 
 /**
  * @file    main.c
@@ -42,8 +42,8 @@
 
 void zmain(void) {
 
-    // Call function here
-    project_sumo();
+    // Call function here();
+    maze_main();
 
     printf("Everything works\n");
 
